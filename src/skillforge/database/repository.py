@@ -9,6 +9,11 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from skillforge.database.migrations import init_database
 from skillforge.database.models import (
+    EdgeType,
+    EntityAlias,
+    GraphEdge,
+    GraphNode,
+    NodeType,
     ProjectProfile,
     SkillDependency,
     SkillRecord,
@@ -209,6 +214,11 @@ class SkillRepository:
             updated_at=row["updated_at"]
         )
 
+    def list_all_skills(self) -> List[SkillRecord]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT * FROM skills ORDER BY name ASC")
+        return [self._row_to_skill(r) for r in cur.fetchall()]
+
     def list_skills(
         self,
         category: Optional[str] = None,
@@ -367,3 +377,145 @@ class SkillRepository:
                 profile_json = excluded.profile_json,
                 last_analyzed_at = excluded.last_analyzed_at;
             """, (profile.project_path, json.dumps(profile.__dict__), datetime.now(timezone.utc).isoformat()))
+
+    # ---------------------------------------------------------
+    # Knowledge Fabric / Graph Operations
+    # ---------------------------------------------------------
+
+    def upsert_graph_node(self, node: GraphNode) -> None:
+        cur = self.conn.cursor()
+        with self.conn:
+            cur.execute("""
+            INSERT INTO graph_nodes (id, node_type, name, metadata_json, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                node_type = excluded.node_type,
+                name = excluded.name,
+                metadata_json = excluded.metadata_json;
+            """, (
+                node.id,
+                node.node_type.value if hasattr(node.node_type, 'value') else str(node.node_type),
+                node.name,
+                json.dumps(node.metadata),
+                node.created_at
+            ))
+
+    def upsert_graph_edge(self, edge: GraphEdge) -> None:
+        cur = self.conn.cursor()
+        with self.conn:
+            cur.execute("""
+            INSERT INTO graph_edges (source_id, target_id, relationship_type, weight, confidence, bidirectional, metadata_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                edge.source_id,
+                edge.target_id,
+                edge.relationship_type.value if hasattr(edge.relationship_type, 'value') else str(edge.relationship_type),
+                edge.weight,
+                edge.confidence,
+                1 if edge.bidirectional else 0,
+                json.dumps(edge.metadata)
+            ))
+
+    def add_entity_alias(self, alias: str, canonical_node_id: str, alias_type: str = "synonym") -> None:
+        cur = self.conn.cursor()
+        with self.conn:
+            cur.execute("""
+            INSERT INTO entity_aliases (alias, canonical_node_id, alias_type)
+            VALUES (?, ?, ?)
+            """, (alias.strip(), canonical_node_id, alias_type))
+
+    def resolve_alias(self, term: str) -> Optional[str]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT canonical_node_id FROM entity_aliases WHERE alias = ? COLLATE NOCASE LIMIT 1", (term.strip(),))
+        row = cur.fetchone()
+        return row["canonical_node_id"] if row else None
+
+    def get_graph_node(self, node_id: str) -> Optional[GraphNode]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT * FROM graph_nodes WHERE id = ?", (node_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        return GraphNode(
+            id=row["id"],
+            node_type=NodeType(row["node_type"]),
+            name=row["name"],
+            metadata=json.loads(row["metadata_json"] or "{}"),
+            created_at=row["created_at"]
+        )
+
+    def get_graph_neighbors(
+        self,
+        node_id: str,
+        relationship_type: Optional[str] = None,
+        max_hops: int = 1
+    ) -> List[Dict[str, Any]]:
+        """Traverse graph neighbors using recursive CTE in SQLite."""
+        cur = self.conn.cursor()
+        if relationship_type:
+            sql = """
+            WITH RECURSIVE graph_path(source_id, target_id, rel_type, weight, depth) AS (
+                SELECT source_id, target_id, relationship_type, weight, 1
+                FROM graph_edges
+                WHERE source_id = ? AND relationship_type = ?
+                UNION
+                SELECT e.source_id, e.target_id, e.relationship_type, e.weight, p.depth + 1
+                FROM graph_edges e
+                JOIN graph_path p ON e.source_id = p.target_id
+                WHERE p.depth < ? AND e.relationship_type = ?
+            )
+            SELECT DISTINCT n.id, n.node_type, n.name, n.metadata_json, gp.rel_type, gp.weight, gp.depth
+            FROM graph_path gp
+            JOIN graph_nodes n ON gp.target_id = n.id
+            ORDER BY gp.depth, gp.weight DESC;
+            """
+            cur.execute(sql, (node_id, relationship_type, max_hops, relationship_type))
+        else:
+            sql = """
+            WITH RECURSIVE graph_path(source_id, target_id, rel_type, weight, depth) AS (
+                SELECT source_id, target_id, relationship_type, weight, 1
+                FROM graph_edges
+                WHERE source_id = ?
+                UNION
+                SELECT e.source_id, e.target_id, e.relationship_type, e.weight, p.depth + 1
+                FROM graph_edges e
+                JOIN graph_path p ON e.source_id = p.target_id
+                WHERE p.depth < ?
+            )
+            SELECT DISTINCT n.id, n.node_type, n.name, n.metadata_json, gp.rel_type, gp.weight, gp.depth
+            FROM graph_path gp
+            JOIN graph_nodes n ON gp.target_id = n.id
+            ORDER BY gp.depth, gp.weight DESC;
+            """
+            cur.execute(sql, (node_id, max_hops))
+
+        results = []
+        for r in cur.fetchall():
+            results.append({
+                "id": r["id"],
+                "node_type": r["node_type"],
+                "name": r["name"],
+                "metadata": json.loads(r["metadata_json"] or "{}"),
+                "relationship": r["rel_type"],
+                "weight": r["weight"],
+                "depth": r["depth"]
+            })
+        return results
+
+    def get_graph_stats(self) -> Dict[str, Any]:
+        cur = self.conn.cursor()
+        cur.execute("SELECT COUNT(*) as cnt FROM graph_nodes")
+        node_count = cur.fetchone()["cnt"]
+        cur.execute("SELECT COUNT(*) as cnt FROM graph_edges")
+        edge_count = cur.fetchone()["cnt"]
+        cur.execute("SELECT COUNT(*) as cnt FROM entity_aliases")
+        alias_count = cur.fetchone()["cnt"]
+        cur.execute("SELECT node_type, COUNT(*) as cnt FROM graph_nodes GROUP BY node_type")
+        types = {r["node_type"]: r["cnt"] for r in cur.fetchall()}
+        return {
+            "total_nodes": node_count,
+            "total_edges": edge_count,
+            "total_aliases": alias_count,
+            "nodes_by_type": types
+        }
+

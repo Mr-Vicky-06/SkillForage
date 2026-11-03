@@ -111,3 +111,52 @@ class RecommendationScore:
     reasoning: str
     warnings: List[str] = field(default_factory=list)
     suggested_role: str = "primary"  # primary, complementary
+
+
+class NodeType(str, Enum):
+    SKILL = "skill"
+    TECHNOLOGY = "technology"
+    CATEGORY = "category"
+    DOMAIN = "domain"
+    CONCEPT = "concept"
+    TOOL = "tool"
+
+
+class EdgeType(str, Enum):
+    PREREQUISITE_FOR = "PREREQUISITE_FOR"
+    COMPLEMENTS = "COMPLEMENTS"
+    CONFLICTS_WITH = "CONFLICTS_WITH"
+    SUPERSEDES = "SUPERSEDES"
+    USES_TECH = "USES_TECH"
+    BELONGS_TO_CATEGORY = "BELONGS_TO_CATEGORY"
+    ASSOCIATED_WITH_CONCEPT = "ASSOCIATED_WITH_CONCEPT"
+
+
+@dataclass
+class GraphNode:
+    id: str
+    node_type: NodeType
+    name: str
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+@dataclass
+class GraphEdge:
+    source_id: str
+    target_id: str
+    relationship_type: str
+    weight: float = 1.0
+    confidence: float = 1.0
+    bidirectional: bool = False
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    id: Optional[int] = None
+
+
+@dataclass
+class EntityAlias:
+    alias: str
+    canonical_node_id: str
+    alias_type: str = "synonym"
+    id: Optional[int] = None
+

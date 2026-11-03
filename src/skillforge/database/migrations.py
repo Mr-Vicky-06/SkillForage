@@ -12,6 +12,9 @@ def init_database(db_path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path), check_same_thread=False)
     conn.execute("PRAGMA journal_mode = WAL;")
     conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA synchronous = NORMAL;")
+    conn.execute("PRAGMA cache_size = -64000;")  # 64MB cache
+    conn.execute("PRAGMA temp_store = MEMORY;")
     
     with conn:
         conn.executescript("""
@@ -132,6 +135,47 @@ def init_database(db_path: str | Path) -> sqlite3.Connection:
         CREATE INDEX IF NOT EXISTS idx_skills_source_type ON skills(source_type);
         CREATE INDEX IF NOT EXISTS idx_skills_status ON skills(status);
         CREATE INDEX IF NOT EXISTS idx_skills_trust ON skills(trust_level);
+
+        -- Knowledge Fabric / Graph Tables
+        CREATE TABLE IF NOT EXISTS graph_nodes (
+            id TEXT PRIMARY KEY,
+            node_type TEXT NOT NULL,
+            name TEXT NOT NULL,
+            metadata_json TEXT,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS graph_edges (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source_id TEXT NOT NULL REFERENCES graph_nodes(id) ON DELETE CASCADE,
+            target_id TEXT NOT NULL REFERENCES graph_nodes(id) ON DELETE CASCADE,
+            relationship_type TEXT NOT NULL,
+            weight REAL DEFAULT 1.0,
+            confidence REAL DEFAULT 1.0,
+            bidirectional INTEGER DEFAULT 0,
+            metadata_json TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS graph_evidence (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            edge_id INTEGER REFERENCES graph_edges(id) ON DELETE CASCADE,
+            evidence_type TEXT NOT NULL,
+            source_snippet TEXT,
+            confidence REAL DEFAULT 1.0
+        );
+
+        CREATE TABLE IF NOT EXISTS entity_aliases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            alias TEXT NOT NULL,
+            canonical_node_id TEXT NOT NULL REFERENCES graph_nodes(id) ON DELETE CASCADE,
+            alias_type TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_graph_nodes_type_name ON graph_nodes(node_type, name);
+        CREATE INDEX IF NOT EXISTS idx_graph_edges_source_rel ON graph_edges(source_id, relationship_type);
+        CREATE INDEX IF NOT EXISTS idx_graph_edges_target_rel ON graph_edges(target_id, relationship_type);
+        CREATE INDEX IF NOT EXISTS idx_graph_edges_type ON graph_edges(relationship_type);
+        CREATE INDEX IF NOT EXISTS idx_entity_aliases_alias ON entity_aliases(alias COLLATE NOCASE);
         """)
         
     return conn
