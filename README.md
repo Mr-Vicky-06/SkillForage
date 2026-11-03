@@ -77,9 +77,9 @@ antigravity-skillforge/
 ├── data/
 │   └── registry.db                     # Embedded SQLite database (Skills & Knowledge Fabric)
 ├── reports/                            # Comprehensive engineering reports & benchmarks
-│   ├── SKILLFORGE_V1_EVOLUTION_METRICS_REPORT.pdf # Visual 3-page executive report
-│   ├── SKILLFORGE_V1_EVOLUTION_METRICS_REPORT.html # Interactive visual report source
+│   ├── SKILL_LIBRARY_EXPANSION_FRONTIERS_REPORT.md # Strategic gap audit & 40-skill roadmap
 │   ├── FINAL_SKILLFORGE_EVOLUTION_REPORT.md      # Master SEP sign-off report
+│   ├── PHASE_12_BEFORE_AFTER_COMPARISON.md       # Empirical V0 vs V1 benchmark analysis
 │   ├── V1_150_BENCHMARK_RESULTS.json             # 150-case benchmark metrics
 │   ├── dashboard-v1-screenshot.png               # Console Overview screenshot
 │   └── dashboard-studio-screenshot.png           # Recommendation Studio screenshot
@@ -202,9 +202,10 @@ Tested across 150 real-world developer scenarios spanning 15 engineering domains
 | **Warm Cache Recall Latency** | 31.60 ms | **0.01 ms** | **>3,000x faster** |
 | **FTS Syntax Crash Rate** | Unsanitized | **0.0% (150/150 passed)** | Robust query tokenizer |
 
-Full visual reports:
-- [Visual PDF Report](reports/SKILLFORGE_V1_EVOLUTION_METRICS_REPORT.pdf)
+Full reports:
+- [Expansion Frontiers & Coverage Report](reports/SKILL_LIBRARY_EXPANSION_FRONTIERS_REPORT.md)
 - [Final Evolution Report](reports/FINAL_SKILLFORGE_EVOLUTION_REPORT.md)
+- [Before vs After Performance Comparison](reports/PHASE_12_BEFORE_AFTER_COMPARISON.md)
 - [150-Case Benchmark Data](reports/V1_150_BENCHMARK_RESULTS.json)
 
 ---
