@@ -1,0 +1,75 @@
+{
+  "version": "V0",
+  "timestamp": "2026-11-03T05:58:17Z",
+  "total_skills_indexed": 851,
+  "database_size_bytes": 2449408,
+  "database_size_mb": 2.34,
+  "source_distribution": {
+    "installed_builtin": 9,
+    "installed_global": 44,
+    "installed_plugin": 66,
+    "installed_project": 8,
+    "offline_book": 724
+  },
+  "trust_level_distribution": {
+    "quarantined": 24,
+    "reviewed": 372,
+    "unverified": 455
+  },
+  "categories_count": 23,
+  "performance": {
+    "search_latency": {
+      "p50_ms": 1.65,
+      "p95_ms": 2.87,
+      "mean_ms": 1.47,
+      "min_ms": 0.31,
+      "max_ms": 3.62,
+      "count": 50,
+      "cold_first_query_ms": 4.66
+    },
+    "recommendation_latency": {
+      "p50_ms": 31.6,
+      "p95_ms": 42.68,
+      "mean_ms": 32.39,
+      "min_ms": 25.13,
+      "max_ms": 42.68,
+      "count": 20
+    },
+    "skill_loading_latency": {
+      "p50_ms": 0.56,
+      "p95_ms": 1.72,
+      "mean_ms": 0.72,
+      "min_ms": 0.3,
+      "max_ms": 1.72,
+      "count": 20
+    },
+    "project_detection_ms": 7.7,
+    "incremental_indexing_ms": 6189.85,
+    "full_indexing_recorded_s": 5.4
+  },
+  "project_detection_baseline": {
+    "project_path": "D:\\setup\\antigravity-skillforge",
+    "languages": [
+      "python"
+    ],
+    "frameworks": [],
+    "package_managers": [
+      "pip"
+    ],
+    "detected_manifests": [
+      "pyproject.toml"
+    ]
+  },
+  "retrieval_benchmark_baseline": {
+    "top_1_accuracy_percent": 90.0,
+    "top_3_accuracy_percent": 100.0,
+    "total_contexts_evaluated": 10,
+    "mean_retrieval_time_ms": 14.2
+  },
+  "pytest_test_suite_baseline": {
+    "total_tests": 21,
+    "passed": 21,
+    "failed": 0,
+    "duration_s": 3.74
+  }
+}
