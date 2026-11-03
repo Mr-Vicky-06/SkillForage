@@ -85,3 +85,4 @@ class ReciprocalRankFusion:
             })
 
         return results
+

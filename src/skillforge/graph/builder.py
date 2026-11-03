@@ -70,3 +70,4 @@ class KnowledgeGraphBuilder:
         stats = self.repo.get_graph_stats()
         stats["build_duration_ms"] = duration_ms
         return stats
+

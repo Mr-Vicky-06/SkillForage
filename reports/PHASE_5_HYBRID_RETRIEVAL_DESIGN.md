@@ -62,3 +62,4 @@ Testing against `data/registry.db` across 851 indexed skills produced:
 
 ---
 *Verified by SEP Engine Phase 5.*
+

@@ -61,3 +61,4 @@ class QueryCache:
             "misses": self._misses,
             "hit_rate": hit_rate
         }
+

@@ -181,3 +181,4 @@ class GraphEntityExtractor:
                 ))
 
         return list(nodes.values()), edges, aliases
+

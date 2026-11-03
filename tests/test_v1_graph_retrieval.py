@@ -95,3 +95,4 @@ def test_new_mcp_tools(repo):
     # List project profiles
     profiles = tools.list_project_profiles()
     assert isinstance(profiles, list)
+

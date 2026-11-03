@@ -1,7 +1,32 @@
+# Python & Virtual Environments
 .venv/
+venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Testing & Coverage
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Build & Egg Artifacts
 *.egg-info/
+dist/
+build/
+
+# Ephemeral SQLite Database Journals & Backups
+*.db-wal
+*.db-shm
+*.bak
 data/cache/
+
+# Playwright & Browser Testing Cache
+.playwright-mcp/
+test-results/
+
+# Environment Variables & Secrets
+.env
+.env.local
 *.log
