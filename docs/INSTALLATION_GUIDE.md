@@ -101,3 +101,4 @@ Run the full automated test suite to confirm complete operational readiness:
 .\.venv\Scripts\pytest -q
 ```
 *Expected Output:* `54 passed in <5s`.
+

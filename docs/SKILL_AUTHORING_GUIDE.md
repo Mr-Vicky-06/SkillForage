@@ -91,3 +91,4 @@ Run test suite to verify checksums and integrity:
 ```bash
 .\.venv\Scripts\pytest -q
 ```
+

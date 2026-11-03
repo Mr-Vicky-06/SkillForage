@@ -35,3 +35,4 @@ When scanning a new source directory, the SLIF indexer:
 
 - If a skill exists in both `installed_project` and `offline_book`, the project-scoped version takes precedence during routing.
 - The registry maintains records of all copies with their source paths, avoiding destructive overwrites.
+

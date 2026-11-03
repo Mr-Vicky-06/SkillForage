@@ -37,3 +37,4 @@ When invoking `LocalSkillExecutor(repo, strict_offline=True)`:
 
 - All previously queried research papers, SEC filings, and patent classification matrices are cached in `research_cache`.
 - Cache lookups use content-addressable SHA-256 keys. If offline, the research engine serves cached responses without querying remote APIs.
+

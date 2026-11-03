@@ -68,3 +68,4 @@ If a loaded skill contains an automated script (e.g. `scripts/verify.py`):
 1. Antigravity requests execution permission.
 2. The script runs locally via `skillforge_execute_script`.
 3. Execution enforces a default 30-second timeout and redacts secrets from parameters and output logs.
+

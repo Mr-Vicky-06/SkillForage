@@ -45,3 +45,4 @@ def sync_fts():
 
 if __name__ == "__main__":
     sync_fts()
+

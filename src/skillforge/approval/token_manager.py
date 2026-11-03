@@ -119,7 +119,6 @@ class ApprovalTokenManager:
         valid_ids = []
         for req in requested_ids:
             req_clean = req.strip()
-            # match either exact ID or exact name
             match = next((
                 c for c in candidate_ids 
                 if c == req_clean 
@@ -137,7 +136,6 @@ class ApprovalTokenManager:
                 return False, f"Skill '{req_clean}' was not in the approved candidate list for token '{token}'.", []
 
         if not valid_ids:
-            # If user said YES without specific IDs, approve all candidates in the list
             valid_ids = list(candidate_ids)
 
         # Transition to LOADED
