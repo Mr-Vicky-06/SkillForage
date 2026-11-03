@@ -108,6 +108,26 @@ def create_mcp_server(db_path: Optional[str] = None) -> MCPServer:
     def skillforge_health() -> Dict[str, Any]:
         return tools.skillforge_health()
 
+    
+    @server.tool(name="list_ecosystem_assets", description="List Antigravity ecosystem assets (rules, agents, plugins, MCP servers, hooks, manifests).")
+    def list_ecosystem_assets(asset_type: str = "", scope: str = "", surface: str = "") -> List[Dict[str, Any]]:
+        t = asset_type.strip() if asset_type else None
+        s = scope.strip() if scope else None
+        surf = surface.strip() if surface else None
+        return tools.list_ecosystem_assets(asset_type=t, scope=s, surface=surf)
+
+    @server.tool(name="get_asset_details", description="Get complete details, metadata, and bundled components for an ecosystem asset.")
+    def get_asset_details(asset_id: str) -> Dict[str, Any]:
+        return tools.get_asset_details(asset_id=asset_id)
+
+    @server.tool(name="recommend_project_setup", description="Recommend complete Antigravity setup (skills, rules, agents, plugins, MCP, hooks) for a project.")
+    def recommend_project_setup(project_path: str = ".") -> Dict[str, Any]:
+        return tools.recommend_project_setup(project_path=project_path)
+
+    @server.tool(name="validate_ecosystem_asset", description="Validate an ecosystem asset against official Antigravity 2.6 specifications.")
+    def validate_ecosystem_asset(asset_id: str) -> Dict[str, Any]:
+        return tools.validate_ecosystem_asset(asset_id=asset_id)
+
     return server
 
 

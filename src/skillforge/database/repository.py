@@ -519,3 +519,221 @@ class SkillRepository:
             "nodes_by_type": types
         }
 
+
+
+    # -------------------------------------------------------------
+    # Antigravity Ecosystem Registry Methods
+    # -------------------------------------------------------------
+
+    def insert_ecosystem_asset(self, asset: Any) -> None:
+        """Insert or replace an Antigravity ecosystem asset."""
+        cur = self.conn.cursor()
+        surfaces = ",".join(asset.compatibility_surfaces) if isinstance(asset.compatibility_surfaces, list) else asset.compatibility_surfaces
+        meta_str = json.dumps(asset.metadata_json) if isinstance(asset.metadata_json, dict) else str(asset.metadata_json or "{}")
+        now = datetime.now(timezone.utc).isoformat()
+        
+        cur.execute("""
+            INSERT OR REPLACE INTO ecosystem_assets (
+                asset_id, asset_type, name, display_name, description,
+                source_id, source_url, source_path, version, license_spdx,
+                license_notes, content_hash, trust_state, validation_state,
+                compatibility_surfaces, install_scope, enabled_state,
+                metadata_json, last_verified_at, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            asset.asset_id,
+            asset.asset_type if isinstance(asset.asset_type, str) else asset.asset_type.value,
+            asset.name,
+            asset.display_name,
+            asset.description,
+            asset.source_id,
+            asset.source_url,
+            asset.source_path,
+            asset.version,
+            asset.license_spdx,
+            asset.license_notes,
+            asset.content_hash,
+            asset.trust_state,
+            asset.validation_state,
+            surfaces,
+            asset.install_scope,
+            asset.enabled_state,
+            meta_str,
+            asset.last_verified_at or now,
+            asset.created_at or now,
+            now
+        ))
+        self.conn.commit()
+
+    def get_ecosystem_asset(self, asset_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve an ecosystem asset by ID."""
+        cur = self.conn.cursor()
+        cur.execute("SELECT * FROM ecosystem_assets WHERE asset_id = ?", (asset_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        res = dict(row)
+        res["compatibility_surfaces"] = res["compatibility_surfaces"].split(",") if res.get("compatibility_surfaces") else []
+        res["metadata_json"] = json.loads(res.get("metadata_json") or "{}")
+        return res
+
+    def list_ecosystem_assets(
+        self,
+        asset_type: Optional[str] = None,
+        scope: Optional[str] = None,
+        surface: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """List ecosystem assets with optional filters."""
+        cur = self.conn.cursor()
+        query = "SELECT * FROM ecosystem_assets WHERE 1=1"
+        params: List[Any] = []
+        if asset_type:
+            query += " AND asset_type = ?"
+            params.append(asset_type)
+        if scope:
+            query += " AND install_scope = ?"
+            params.append(scope)
+        if surface:
+            query += " AND compatibility_surfaces LIKE ?"
+            params.append(f"%{surface}%")
+        query += " ORDER BY asset_type, name"
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        results = []
+        for r in rows:
+            d = dict(r)
+            d["compatibility_surfaces"] = d["compatibility_surfaces"].split(",") if d.get("compatibility_surfaces") else []
+            d["metadata_json"] = json.loads(d.get("metadata_json") or "{}")
+            results.append(d)
+        return results
+
+    def get_ecosystem_stats(self) -> Dict[str, Any]:
+        """Aggregate stats for ecosystem assets by type, scope, and validation state."""
+        cur = self.conn.cursor()
+        cur.execute("SELECT COUNT(*) as cnt FROM ecosystem_assets")
+        total = cur.fetchone()["cnt"]
+
+        cur.execute("SELECT asset_type, COUNT(*) as cnt FROM ecosystem_assets GROUP BY asset_type")
+        by_type = {r["asset_type"]: r["cnt"] for r in cur.fetchall()}
+
+        cur.execute("SELECT install_scope, COUNT(*) as cnt FROM ecosystem_assets GROUP BY install_scope")
+        by_scope = {r["install_scope"]: r["cnt"] for r in cur.fetchall()}
+
+        cur.execute("SELECT validation_state, COUNT(*) as cnt FROM ecosystem_assets GROUP BY validation_state")
+        by_validation = {r["validation_state"]: r["cnt"] for r in cur.fetchall()}
+
+        cur.execute("SELECT COUNT(*) as cnt FROM mcp_capabilities")
+        total_caps = cur.fetchone()["cnt"]
+
+        cur.execute("SELECT COUNT(*) as cnt FROM ecosystem_components")
+        total_components = cur.fetchone()["cnt"]
+
+        return {
+            "total_assets": total,
+            "by_type": by_type,
+            "by_scope": by_scope,
+            "by_validation": by_validation,
+            "total_mcp_capabilities": total_caps,
+            "total_components": total_components
+        }
+
+    def link_ecosystem_component(self, parent_id: str, child_id: str, rel_type: str = "bundles", metadata: Optional[Dict[str, Any]] = None) -> None:
+        """Link a parent asset (e.g. plugin) to a child asset (e.g. bundled skill)."""
+        cur = self.conn.cursor()
+        cur.execute("""
+            INSERT INTO ecosystem_components (parent_asset_id, child_asset_id, relationship_type, metadata_json)
+            VALUES (?, ?, ?, ?)
+        """, (parent_id, child_id, rel_type, json.dumps(metadata or {})))
+        self.conn.commit()
+
+    def get_ecosystem_components(self, parent_asset_id: str) -> List[Dict[str, Any]]:
+        """Retrieve all components bundled by a parent asset."""
+        cur = self.conn.cursor()
+        cur.execute("""
+            SELECT c.*, a.name, a.asset_type, a.description, a.compatibility_surfaces, a.validation_state
+            FROM ecosystem_components c
+            JOIN ecosystem_assets a ON c.child_asset_id = a.asset_id
+            WHERE c.parent_asset_id = ?
+        """, (parent_asset_id,))
+        rows = cur.fetchall()
+        results = []
+        for r in rows:
+            d = dict(r)
+            d["compatibility_surfaces"] = d["compatibility_surfaces"].split(",") if d.get("compatibility_surfaces") else []
+            d["metadata_json"] = json.loads(d.get("metadata_json") or "{}")
+            results.append(d)
+        return results
+
+    def insert_mcp_capability(self, cap: Any) -> None:
+        """Record an MCP tool, resource, or prompt capability."""
+        cur = self.conn.cursor()
+        cur.execute("""
+            INSERT INTO mcp_capabilities (
+                server_asset_id, capability_type, name, description,
+                schema_json, risk_class, permission_mode, auth_required
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            cap.server_asset_id,
+            cap.capability_type,
+            cap.name,
+            cap.description,
+            json.dumps(cap.schema_json or {}),
+            cap.risk_class,
+            cap.permission_mode,
+            1 if cap.auth_required else 0
+        ))
+        self.conn.commit()
+
+    def list_mcp_capabilities(self, server_asset_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List MCP capabilities with optional server filter."""
+        cur = self.conn.cursor()
+        if server_asset_id:
+            cur.execute("SELECT * FROM mcp_capabilities WHERE server_asset_id = ? ORDER BY capability_type, name", (server_asset_id,))
+        else:
+            cur.execute("SELECT * FROM mcp_capabilities ORDER BY server_asset_id, capability_type, name")
+        rows = cur.fetchall()
+        results = []
+        for r in rows:
+            d = dict(r)
+            d["schema_json"] = json.loads(d.get("schema_json") or "{}")
+            results.append(d)
+        return results
+
+    def record_asset_evidence(self, evidence: Any) -> None:
+        """Record audit or validation evidence for an asset."""
+        cur = self.conn.cursor()
+        cur.execute("""
+            INSERT INTO asset_evidence (
+                asset_id, evidence_source, content_hash, extraction_method,
+                validation_result, notes, timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            evidence.asset_id,
+            evidence.evidence_source,
+            evidence.content_hash,
+            evidence.extraction_method,
+            evidence.validation_result,
+            evidence.notes,
+            evidence.timestamp or datetime.now(timezone.utc).isoformat()
+        ))
+        self.conn.commit()
+
+    def record_asset_installation(self, inst: Any) -> None:
+        """Record an installation event for an ecosystem asset."""
+        cur = self.conn.cursor()
+        cur.execute("""
+            INSERT INTO asset_installations (
+                asset_id, target_scope, target_path, installed_version,
+                installed_hash, install_status, verification_result, installed_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            inst.asset_id,
+            inst.target_scope,
+            inst.target_path,
+            inst.installed_version,
+            inst.installed_hash,
+            inst.install_status,
+            inst.verification_result,
+            inst.installed_at or datetime.now(timezone.utc).isoformat()
+        ))
+        self.conn.commit()

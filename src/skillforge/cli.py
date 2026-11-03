@@ -394,6 +394,109 @@ def serve_dashboard(host: str, port: int):
     start_dashboard(host=host, port=port)
 
 
+
+
+# -------------------------------------------------------------
+# Antigravity Ecosystem CLI Group
+# -------------------------------------------------------------
+
+@cli.group("ecosystem")
+def ecosystem_group():
+    """Antigravity Ecosystem Registry & Customization Management."""
+    pass
+
+
+@ecosystem_group.command("scan")
+@click.option("--workspace", default=".", help="Workspace path to scan for .agents/.")
+@click.option("--json-out", is_flag=True, help="Output scan results as JSON.")
+def ecosystem_scan(workspace: str, json_out: bool):
+    """Scan and index all Antigravity ecosystem assets (rules, agents, plugins, MCP, hooks)."""
+    from skillforge.ecosystem.scanner import EcosystemScanner
+    repo = get_default_repo()
+    scanner = EcosystemScanner(repo)
+    stats = scanner.scan_all(workspace_roots=[Path(workspace).resolve()])
+    if json_out:
+        click.echo(json.dumps(stats, indent=2))
+    else:
+        click.echo(f"Ecosystem scan complete. Indexed {stats['total_assets_indexed']} assets:")
+        for k, v in stats.items():
+            click.echo(f"  {k}: {v}")
+
+
+@ecosystem_group.command("status")
+@click.option("--json-out", is_flag=True, help="Output status as JSON.")
+def ecosystem_status(json_out: bool):
+    """Show Antigravity Ecosystem Registry statistics."""
+    repo = get_default_repo()
+    stats = repo.get_ecosystem_stats()
+    if json_out:
+        click.echo(json.dumps(stats, indent=2))
+    else:
+        click.echo("Antigravity Ecosystem Registry Status:")
+        click.echo(f"  Total Registered Assets: {stats['total_assets']}")
+        click.echo(f"  Total MCP Capabilities: {stats['total_mcp_capabilities']}")
+        click.echo(f"  Total Bundled Components: {stats['total_components']}")
+        click.echo("  Assets by Type:")
+        for t, cnt in stats.get("by_type", {}).items():
+            click.echo(f"    - {t}: {cnt}")
+        click.echo("  Assets by Scope:")
+        for s, cnt in stats.get("by_scope", {}).items():
+            click.echo(f"    - {s}: {cnt}")
+
+
+@ecosystem_group.command("list")
+@click.option("--type", "asset_type", default=None, help="Filter by asset type.")
+@click.option("--scope", default=None, help="Filter by scope (global/workspace/built_in).")
+@click.option("--surface", default=None, help="Filter by surface (antigravity_ide/app/cli).")
+@click.option("--json-out", is_flag=True, help="Output as JSON.")
+def ecosystem_list(asset_type: Optional[str], scope: Optional[str], surface: Optional[str], json_out: bool):
+    """List registered Antigravity ecosystem assets."""
+    repo = get_default_repo()
+    assets = repo.list_ecosystem_assets(asset_type=asset_type, scope=scope, surface=surface)
+    if json_out:
+        click.echo(json.dumps(assets, indent=2))
+    else:
+        click.echo(f"Found {len(assets)} ecosystem assets:")
+        for a in assets:
+            click.echo(f"  [{a['asset_type']}] {a['name']} (scope={a['install_scope']}, validation={a['validation_state']})")
+            if a.get("description"):
+                click.echo(f"    {a['description'][:80]}...")
+
+
+@ecosystem_group.command("recommend")
+@click.option("--project", default=".", help="Project path to analyze and recommend for.")
+@click.option("--json-out", is_flag=True, help="Output recommendation plan as JSON.")
+def ecosystem_recommend(project: str, json_out: bool):
+    """Recommend complete Antigravity setup (skills, rules, agents, MCP, hooks) for a project."""
+    from skillforge.ecosystem.recommender import EcosystemRecommender
+    repo = get_default_repo()
+    recommender = EcosystemRecommender(repo)
+    plan = recommender.recommend_setup(Path(project).resolve())
+    if json_out:
+        click.echo(json.dumps(plan, indent=2))
+    else:
+        click.echo(f"=== Antigravity Customization Plan: {plan['project_name']} ===")
+        click.echo(f"Rationale: {plan['summary_rationale']}\n")
+        click.echo(f"1. Skills ({len(plan['recommended_skills'])}):")
+        for s in plan["recommended_skills"]:
+            click.echo(f"   - {s['name']}: {s['reason']}")
+        click.echo(f"\n2. Rules ({len(plan['recommended_rules'])}):")
+        for r in plan["recommended_rules"]:
+            click.echo(f"   - {r['name']} (trigger={r['trigger']}): {r['reason']}")
+        click.echo(f"\n3. Custom Agents ({len(plan['recommended_agents'])}):")
+        for a in plan["recommended_agents"]:
+            click.echo(f"   - {a['name']} ({a['role']}, model={a['model']}): {a['reason']}")
+        click.echo(f"\n4. Plugins ({len(plan['recommended_plugins'])}):")
+        for pl in plan["recommended_plugins"]:
+            click.echo(f"   - {pl['name']} (v{pl['version']}): {pl['reason']}")
+        click.echo(f"\n5. MCP Servers ({len(plan['recommended_mcp_servers'])}):")
+        for m in plan["recommended_mcp_servers"]:
+            click.echo(f"   - {m['name']} ({m['transport']}): {m['reason']}")
+        click.echo(f"\n6. Hooks ({len(plan['recommended_hooks'])}):")
+        for h in plan["recommended_hooks"]:
+            click.echo(f"   - {h['event']} ({h['matcher']}): {h['command']}")
+
+
 def main():
     cli()
 

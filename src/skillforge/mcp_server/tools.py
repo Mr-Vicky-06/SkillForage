@@ -428,3 +428,40 @@ class SkillForgeTools:
         }
 
 
+    def list_ecosystem_assets(self, asset_type: Optional[str] = None, scope: Optional[str] = None, surface: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List registered Antigravity ecosystem assets (rules, agents, plugins, MCP, hooks)."""
+        return self.repo.list_ecosystem_assets(asset_type=asset_type, scope=scope, surface=surface)
+
+    def get_asset_details(self, asset_id: str) -> Dict[str, Any]:
+        """Get complete details, bundled components, and evidence for an ecosystem asset."""
+        asset = self.repo.get_ecosystem_asset(asset_id)
+        if not asset:
+            return {"error": f"Asset '{asset_id}' not found."}
+        components = self.repo.get_ecosystem_components(asset_id)
+        return {
+            "asset": asset,
+            "components": components
+        }
+
+    def recommend_project_setup(self, project_path: str = ".") -> Dict[str, Any]:
+        """Recommend a complete Antigravity setup (skills, rules, agents, plugins, MCP, hooks) for a project."""
+        from skillforge.ecosystem.recommender import EcosystemRecommender
+        recommender = EcosystemRecommender(self.repo)
+        return recommender.recommend_setup(project_path)
+
+    def validate_ecosystem_asset(self, asset_id: str) -> Dict[str, Any]:
+        """Validate an ecosystem asset against Antigravity 2.6 specification."""
+        asset = self.repo.get_ecosystem_asset(asset_id)
+        if not asset:
+            return {"error": f"Asset '{asset_id}' not found."}
+        return {
+            "asset_id": asset_id,
+            "name": asset["name"],
+            "asset_type": asset["asset_type"],
+            "validation_state": asset["validation_state"],
+            "trust_state": asset["trust_state"],
+            "compatibility_surfaces": asset["compatibility_surfaces"],
+            "is_ide_compatible": "antigravity_ide" in asset["compatibility_surfaces"]
+        }
+
+

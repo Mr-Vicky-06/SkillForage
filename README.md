@@ -4,7 +4,7 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-FastMCP%20stdio-green.svg)](https://modelcontextprotocol.io/)
 [![SQLite Knowledge Fabric](https://img.shields.io/badge/SQLite-Recursive%20CTE%20Graph-purple.svg)](https://www.sqlite.org/)
-[![Tests](https://img.shields.io/badge/Tests-26%2F26%20Passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-34%2F34%20Passed-brightgreen.svg)]()
 [![Local-First](https://img.shields.io/badge/Architecture-100%25%20Local--First-orange.svg)]()
 
 SkillForge is a local-first, context-aware skill retrieval and engineering intelligence platform for **Google Antigravity**. It indexes hundreds of agent skills outside the agent's context window, constructing an embedded Knowledge Fabric that delivers just-in-time skills, architecture patterns, and tools matching the user's active task and project stack.
@@ -17,7 +17,7 @@ SkillForge is a local-first, context-aware skill retrieval and engineering intel
 - **Hybrid Retrieval Engine (RRF):** Blends Lexical FTS5, Graph proximity, Project stack alignment, and Tool affinity using Reciprocal Rank Fusion ($k=60.0$).
 - **Content-Hashed In-Memory QueryCache:** Drops warm query recommendation latency to **0.01 ms** (>3,000x speedup).
 - **5 Adaptive Retrieval Modes:** `FAST` (<5ms), `BALANCED` (<12ms), `DEEP` (<25ms), `BOOTSTRAP`, and `DISCOVERY`.
-- **Expanded FastMCP Stdio Surface:** 14 tools providing status, search, recommendations, graph exploration, project profiling, and health diagnostics.
+- **Expanded FastMCP Stdio Surface:** 18 tools providing status, search, recommendations, graph exploration, project profiling, and health diagnostics.
 - **10-View Developer Intelligence Console:** Pure local HTML5/canvas dashboard running on `http://127.0.0.1:8765`.
 - **100% Local-First Guarantee:** Zero cloud databases, zero paid APIs, zero telemetry.
 
@@ -101,17 +101,22 @@ antigravity-skillforge/
 │       ├── indexer/                    # Scanner, metadata parser & validator
 │       ├── mcp_server/                 # Model Context Protocol stdio server
 │       │   ├── server.py               # FastMCP endpoint registrations
-│       │   └── tools.py                # 14 tool implementation handlers
+│       │   └── tools.py                # 18 tool implementation handlers
 │       ├── retrieval/                  # Hybrid retrieval subsystem
 │       │   ├── cache.py                # Content-hashed LRU query cache
 │       │   ├── engine.py               # 5-mode hybrid retrieval coordinator
 │       │   ├── fusion.py               # Reciprocal Rank Fusion combiner
 │       │   ├── ranking.py              # Multi-factor candidate scorer
 │       │   └── search.py               # Sanitized FTS5 search
+│       ├── ecosystem/                  # Antigravity Ecosystem Registry
+│       │   ├── parsers.py              # Rule, Agent, Plugin, Hook, MCP, Manifest parsers
+│       │   ├── scanner.py              # Cross-scope scanner & capability indexer
+│       │   └── recommender.py          # Complete setup recommendation engine
 │       ├── security/                   # Path guard & content auditing
 │       └── cli.py                      # SkillForge management CLI
-├── tests/                              # Automated test suite (26 tests)
+├── tests/                              # Automated test suite (34 tests)
 │   ├── test_analyzer.py
+│   ├── test_ecosystem_registry.py      # Ecosystem parser & registry test suite
 │   ├── test_eval_10_contexts.py
 │   ├── test_indexer.py
 │   ├── test_mcp_e2e_protocol.py
@@ -121,6 +126,35 @@ antigravity-skillforge/
 ├── .gitignore
 ├── pyproject.toml
 └── README.md
+```
+
+---
+
+## 🌐 Antigravity Ecosystem Registry (V1.1)
+
+SkillForge expands beyond procedural `SKILL.md` folders into a **typed Antigravity Extensibility Registry**, natively indexing all 10 Antigravity customization primitives:
+
+1. **Agent Skills (`SKILL.md`)**: Progressive disclosure procedural knowledge (851 skills indexed).
+2. **Workspace Instructions (`AGENTS.md`)**: Always-on persistent baseline conventions.
+3. **Modular Rules (`.agents/rules/*.md`)**: Scoped rules triggered by `model_decision`, `glob`, or `always_on`.
+4. **Custom Subagents (`.agents/agents/*.md`)**: Delegated execution profiles with isolated tool allowlists.
+5. **Plugin Bundles (`plugin.json`)**: Versioned package containers bundling skills, agents, rules, and MCP servers.
+6. **Lifecycle Hooks (`hooks.json`)**: Shell automation on `SessionStart`, `PreToolUse`, `Stop`, etc.
+7. **MCP Servers (`mcp_config.json`)**: Structured capabilities, tools, and resources with zero credential leakage.
+8. **Discovery Manifests (`*.json`)**: Path pointers overcoming single-level scan depth limitations.
+9. **Sidecars (`sidecar.json`)**: App-surface background daemons (isolated and disabled on Standalone IDE).
+10. **Legacy Workflows**: Deprecated single-file automations flagged for `/migrate-workflows`.
+
+### Ecosystem CLI Commands
+```bash
+# Scan and index all Antigravity ecosystem assets across workspace, global, and supplemental roots
+skillforge ecosystem scan
+
+# Show ecosystem registry counts and asset distributions
+skillforge ecosystem status
+
+# Recommend a complete, multi-layered Antigravity setup (skills + rules + agents + MCP + hooks)
+skillforge ecosystem recommend --project .
 ```
 
 ---
@@ -183,9 +217,10 @@ To connect SkillForge directly to Google Antigravity or any MCP-compatible agent
 }
 ```
 
-### Registered MCP Tools (14 Tools):
+### Registered MCP Tools (18 Tools):
 - **Core Operations:** `skillforge_status`, `search_skills`, `analyze_project`, `recommend_skills`, `load_skill`, `read_skill_resource`, `list_skills`, `validate_skill`, `record_skill_feedback`.
 - **Knowledge Fabric & Intelligence:** `explain_recommendation`, `graph_query`, `graph_neighbors`, `list_project_profiles`, `skillforge_health`.
+- **Antigravity Ecosystem Registry:** `list_ecosystem_assets`, `get_asset_details`, `recommend_project_setup`, `validate_ecosystem_asset`.
 
 ---
 

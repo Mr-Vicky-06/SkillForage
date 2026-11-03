@@ -176,6 +176,92 @@ def init_database(db_path: str | Path) -> sqlite3.Connection:
         CREATE INDEX IF NOT EXISTS idx_graph_edges_target_rel ON graph_edges(target_id, relationship_type);
         CREATE INDEX IF NOT EXISTS idx_graph_edges_type ON graph_edges(relationship_type);
         CREATE INDEX IF NOT EXISTS idx_entity_aliases_alias ON entity_aliases(alias COLLATE NOCASE);
+        
+        -- Antigravity Ecosystem Registry Tables
+        CREATE TABLE IF NOT EXISTS ecosystem_assets (
+            asset_id TEXT PRIMARY KEY,
+            asset_type TEXT NOT NULL,
+            name TEXT NOT NULL,
+            display_name TEXT,
+            description TEXT,
+            source_id TEXT,
+            source_url TEXT,
+            source_path TEXT,
+            version TEXT DEFAULT '1.0.0',
+            license_spdx TEXT DEFAULT 'MIT',
+            license_notes TEXT,
+            content_hash TEXT,
+            trust_state TEXT DEFAULT 'reviewed',
+            validation_state TEXT DEFAULT 'unverified',
+            compatibility_surfaces TEXT DEFAULT 'antigravity_ide',
+            install_scope TEXT DEFAULT 'workspace',
+            enabled_state TEXT DEFAULT 'discovered',
+            metadata_json TEXT,
+            last_verified_at TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS ecosystem_components (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            parent_asset_id TEXT NOT NULL REFERENCES ecosystem_assets(asset_id) ON DELETE CASCADE,
+            child_asset_id TEXT NOT NULL,
+            relationship_type TEXT NOT NULL,
+            metadata_json TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS mcp_capabilities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            server_asset_id TEXT NOT NULL REFERENCES ecosystem_assets(asset_id) ON DELETE CASCADE,
+            capability_type TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            schema_json TEXT,
+            risk_class TEXT DEFAULT 'read_only',
+            permission_mode TEXT DEFAULT 'ask',
+            auth_required INTEGER DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS asset_evidence (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id TEXT NOT NULL REFERENCES ecosystem_assets(asset_id) ON DELETE CASCADE,
+            evidence_source TEXT NOT NULL,
+            content_hash TEXT,
+            extraction_method TEXT DEFAULT 'static_ast',
+            validation_result TEXT DEFAULT 'VERIFIED',
+            notes TEXT,
+            timestamp TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS asset_installations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id TEXT NOT NULL REFERENCES ecosystem_assets(asset_id) ON DELETE CASCADE,
+            target_scope TEXT NOT NULL,
+            target_path TEXT NOT NULL,
+            installed_version TEXT DEFAULT '1.0.0',
+            installed_hash TEXT,
+            install_status TEXT DEFAULT 'active',
+            verification_result TEXT DEFAULT 'VERIFIED',
+            installed_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS asset_relationships (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source_asset_id TEXT NOT NULL REFERENCES ecosystem_assets(asset_id) ON DELETE CASCADE,
+            target_asset_id TEXT NOT NULL,
+            relationship_type TEXT NOT NULL,
+            confidence REAL DEFAULT 1.0,
+            notes TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_ecosystem_assets_type ON ecosystem_assets(asset_type);
+        CREATE INDEX IF NOT EXISTS idx_ecosystem_assets_scope ON ecosystem_assets(install_scope);
+        CREATE INDEX IF NOT EXISTS idx_ecosystem_assets_enabled ON ecosystem_assets(enabled_state);
+        CREATE INDEX IF NOT EXISTS idx_ecosystem_components_parent ON ecosystem_components(parent_asset_id);
+        CREATE INDEX IF NOT EXISTS idx_ecosystem_components_child ON ecosystem_components(child_asset_id);
+        CREATE INDEX IF NOT EXISTS idx_mcp_capabilities_server ON mcp_capabilities(server_asset_id);
+        CREATE INDEX IF NOT EXISTS idx_mcp_capabilities_name ON mcp_capabilities(name);
+
         """)
         
     return conn

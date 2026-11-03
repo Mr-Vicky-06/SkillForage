@@ -160,3 +160,105 @@ class EntityAlias:
     alias_type: str = "synonym"
     id: Optional[int] = None
 
+
+
+class EcosystemAssetType(str, Enum):
+    AGENT_SKILL = "agent_skill"
+    AGENT_RULE = "agent_rule"
+    WORKSPACE_INSTRUCTION = "workspace_instruction"
+    CUSTOM_AGENT = "custom_agent"
+    PLUGIN_BUNDLE = "plugin_bundle"
+    LIFECYCLE_HOOK = "lifecycle_hook"
+    MCP_SERVER = "mcp_server"
+    MCP_TOOL = "mcp_tool"
+    MCP_RESOURCE = "mcp_resource"
+    MCP_PROMPT = "mcp_prompt"
+    DISCOVERY_MANIFEST = "discovery_manifest"
+    SIDECAR = "sidecar"
+    LEGACY_WORKFLOW = "legacy_workflow"
+    IDE_EXTENSION = "ide_extension"
+    OFFICIAL_BUNDLE = "official_bundle"
+    REFERENCE_PACK = "reference_pack"
+    EVALUATION_PACK = "evaluation_pack"
+
+
+@dataclass
+class EcosystemAsset:
+    asset_id: str
+    asset_type: str
+    name: str
+    display_name: str
+    description: str
+    source_id: str
+    source_url: str = ""
+    source_path: str = ""
+    version: str = "1.0.0"
+    license_spdx: str = "MIT"
+    license_notes: str = ""
+    content_hash: str = ""
+    trust_state: str = "reviewed"
+    validation_state: str = "unverified"
+    compatibility_surfaces: List[str] = field(default_factory=lambda: ["antigravity_ide"])
+    install_scope: str = "workspace"
+    enabled_state: str = "discovered"
+    metadata_json: Dict[str, Any] = field(default_factory=dict)
+    last_verified_at: Optional[str] = None
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+@dataclass
+class EcosystemComponent:
+    parent_asset_id: str
+    child_asset_id: str
+    relationship_type: str  # 'contains', 'bundles', 'depends_on', 'provides'
+    metadata_json: Dict[str, Any] = field(default_factory=dict)
+    id: Optional[int] = None
+
+
+@dataclass
+class MCPCapability:
+    server_asset_id: str
+    capability_type: str  # 'tool', 'resource', 'prompt'
+    name: str
+    description: str = ""
+    schema_json: Dict[str, Any] = field(default_factory=dict)
+    risk_class: str = "read_only"  # 'read_only', 'state_mutating', 'destructive'
+    permission_mode: str = "ask"  # 'ask', 'allow', 'deny'
+    auth_required: bool = False
+    id: Optional[int] = None
+
+
+@dataclass
+class AssetEvidence:
+    asset_id: str
+    evidence_source: str
+    content_hash: str = ""
+    extraction_method: str = "static_ast"
+    validation_result: str = "VERIFIED"  # 'VERIFIED', 'PARTIALLY VERIFIED', 'FAILED', 'NOT TESTED'
+    notes: str = ""
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    id: Optional[int] = None
+
+
+@dataclass
+class AssetInstallation:
+    asset_id: str
+    target_scope: str  # 'workspace', 'global'
+    target_path: str
+    installed_version: str = "1.0.0"
+    installed_hash: str = ""
+    install_status: str = "active"  # 'active', 'disabled', 'orphaned'
+    verification_result: str = "VERIFIED"
+    installed_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    id: Optional[int] = None
+
+
+@dataclass
+class AssetRelationship:
+    source_asset_id: str
+    target_asset_id: str
+    relationship_type: str
+    confidence: float = 1.0
+    notes: str = ""
+    id: Optional[int] = None
