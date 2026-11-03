@@ -1,0 +1,28 @@
+{
+  "id": "crossref-doi-metadata-resolver",
+  "name": "crossref-doi-metadata-resolver",
+  "title": "CrossRef DOI Metadata Resolver",
+  "description": "Resolves raw citations, unverified references, and DOIs into verified BibTeX entries and Crossref metadata.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "scholarly-literature",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "doi",
+    "crossref",
+    "bibtex",
+    "citation-resolver"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "a32afdae998146f23fd8b7fd51d7c9a688ef4724de00985e3a2b98694b615810",
+  "external_apis": [
+    "https://api.crossref.org/works/"
+  ]
+}

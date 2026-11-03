@@ -1,0 +1,28 @@
+{
+  "id": "package-supply-chain-auditor",
+  "name": "package-supply-chain-auditor",
+  "title": "Package Supply Chain Security & Hygiene Auditor",
+  "description": "Evaluates dependency hygiene, OpenSSF Scorecards, pinned hashes, signed releases, and known vulnerability advisories (OSV).",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "open-source",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "supply-chain",
+    "openssf",
+    "security",
+    "dependencies"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "dc4745a5d96fecbd6557559d1a2e75cb8f3cdd6f16b44dc076ed9c02ab007740",
+  "external_apis": [
+    "https://api.osv.dev/v1/query"
+  ]
+}

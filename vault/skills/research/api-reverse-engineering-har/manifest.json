@@ -1,0 +1,26 @@
+{
+  "id": "api-reverse-engineering-har",
+  "name": "api-reverse-engineering-har",
+  "title": "API Reverse Engineering from HAR Captures",
+  "description": "Analyzes HTTP Archive (HAR) captures and mitmproxy traces to reconstruct undocumented REST/GraphQL schemas into OpenAPI 3.1 specifications.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "technical-architecture",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "reverse-engineering",
+    "har",
+    "openapi",
+    "api"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "24958e3143c59669da82a0a33525a2609acc90d918a8a3fc1ed7f37a63225e0e",
+  "external_apis": []
+}

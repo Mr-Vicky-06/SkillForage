@@ -36,3 +36,15 @@ def is_safe_resource_path(base_dir: str | Path, relative_path: str) -> bool:
         return True
     except (PathTraversalError, ValueError):
         return False
+
+
+class PathGuard:
+    """Security guard class to validate safe file access and prevent path traversal."""
+
+    @staticmethod
+    def validate_safe_path(base_dir: str | Path, relative_path: str) -> Path:
+        return validate_safe_relative_path(base_dir, relative_path)
+
+    @staticmethod
+    def is_safe(base_dir: str | Path, relative_path: str) -> bool:
+        return is_safe_resource_path(base_dir, relative_path)

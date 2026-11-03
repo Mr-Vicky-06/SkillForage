@@ -1,0 +1,27 @@
+{
+  "id": "latex-paper-authoring",
+  "name": "latex-paper-authoring",
+  "title": "LaTeX Academic Paper Authoring",
+  "description": "Generates publication-ready academic papers (IEEE, ACM, NeurIPS) with verified LaTeX equations, tables, and bibliography.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "scholarly-literature",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "latex",
+    "academic-writing",
+    "typesetting",
+    "ieee",
+    "acm"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "9615ca8ff80bdc61777007b8d162abde4504cbef9a674facfe2b878d86e3ac5c",
+  "external_apis": []
+}

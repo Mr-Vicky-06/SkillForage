@@ -1,0 +1,26 @@
+{
+  "id": "technology-comparison-matrix",
+  "name": "technology-comparison-matrix",
+  "title": "Technology Multi-Criteria Comparison Matrix",
+  "description": "Evaluates competing technologies, libraries, and frameworks across latency, license, community, DX, and trade-offs using MCDA scoring.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "technical-architecture",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "architecture",
+    "trade-offs",
+    "evaluation",
+    "benchmarking"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "75ff03b10498cd64c8e215d9b957447b315fc916d86903ced2ff2078f2cd6989",
+  "external_apis": []
+}

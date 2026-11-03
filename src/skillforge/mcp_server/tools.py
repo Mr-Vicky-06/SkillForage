@@ -79,21 +79,28 @@ class SkillForgeTools:
         )
         recommendations = []
         for s in selected:
+            skill_rec = self.repo.get_skill_by_id(s.skill_id)
+            cat = skill_rec.category if skill_rec else "general"
             recommendations.append({
                 "skill_name": s.skill_name,
                 "skill_id": s.skill_id,
+                "name": s.skill_name,
+                "id": s.skill_id,
+                "category": cat,
                 "role": s.suggested_role,
                 "confidence": s.confidence,
                 "source_type": s.source_type.value,
                 "source_path": s.source_path,
                 "reasoning": s.reasoning,
-                "warnings": s.warnings
+                "warnings": s.warnings,
+                "offline_capable": True
             })
         return {
             "task": task,
             "selected_count": len(recommendations),
             "explanation": explanation,
             "recommendations": recommendations,
+            "recommended_skills": recommendations,
             "project_summary": {
                 "languages": profile.languages if profile else [],
                 "frameworks": profile.frameworks if profile else []
@@ -465,3 +472,99 @@ class SkillForgeTools:
         }
 
 
+
+    def slif_recommend_skills(self, task: str, project_path: Optional[str] = None, conversation_id: str = "", max_skills: int = 3) -> Dict[str, Any]:
+        """Generate ranked candidate skills with human approval token and consent prompt."""
+        from skillforge.approval.token_manager import ApprovalTokenManager
+        recs = self.recommend_skills(task=task, project_path=project_path, max_skills=max_skills)
+        recommended = recs.get("recommended_skills", [])
+        if not recommended:
+            return {
+                "task": task,
+                "needs_approval": False,
+                "recommended_skills": [],
+                "message": "No specialized skills required for this general task."
+            }
+
+        token_mgr = ApprovalTokenManager(self.repo.db_path)
+        candidate_ids = [s["id"] for s in recommended]
+        token = token_mgr.create_approval_request(
+            task=task,
+            candidate_ids=candidate_ids,
+            conversation_id=conversation_id
+        )
+
+        skill_names = [s["name"] for s in recommended]
+        names_str = ", ".join(f"'{n}'" for n in skill_names)
+
+        return {
+            "task": task,
+            "needs_approval": True,
+            "approval_token": token,
+            "recommended_skills": recommended,
+            "approval_prompt": f"To activate specialist skill(s) {names_str}, please reply with:\n- YES (to approve all)\n- SELECT <id/name> (to select specific skills)\n- NO (to decline and continue with standard capabilities)",
+            "candidate_ids": candidate_ids,
+            "expires_in_minutes": 15
+        }
+
+    def slif_load_approved_skills(self, approval_token: str, approved_skill_ids: List[str], conversation_id: str = "") -> Dict[str, Any]:
+        """Load specialist skill instructions into context, strictly requiring verified approval token."""
+        from skillforge.runtime.loader import ControlledSkillLoader
+        loader = ControlledSkillLoader(self.repo)
+        results = []
+        for sid in approved_skill_ids:
+            res = loader.load_approved_skill(
+                skill_identifier=sid,
+                approval_token=approval_token,
+                conversation_id=conversation_id
+            )
+            results.append(res)
+
+        all_authorized = all(r.get("authorized", False) for r in results)
+        return {
+            "all_authorized": all_authorized,
+            "approval_token": approval_token,
+            "loaded_skills": results
+        }
+
+    def slif_decline_skills(self, approval_token: str, conversation_id: str = "") -> Dict[str, Any]:
+        """Record human decline of recommended skills."""
+        from skillforge.approval.token_manager import ApprovalTokenManager
+        token_mgr = ApprovalTokenManager(self.repo.db_path)
+        success = token_mgr.decline_request(approval_token, conversation_id=conversation_id)
+        return {
+            "approval_token": approval_token,
+            "declined": success,
+            "message": "Specialist skills declined. Antigravity will proceed using standard built-in capabilities."
+        }
+
+    def slif_cross_source_verify(self, statement: str, sources: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Verify empirical or research statements against multi-tier evidence sources."""
+        from skillforge.research.cross_verifier import CrossSourceVerifier
+        verifier = CrossSourceVerifier(self.repo.db_path)
+        return verifier.verify_statement(statement=statement, sources=sources)
+
+    def slif_execute_script(
+        self,
+        skill_identifier: str,
+        script_path: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        granted_permissions: Optional[List[str]] = None,
+        approval_token: str = "",
+        conversation_id: str = "",
+        dry_run: bool = False,
+        timeout: float = 30.0
+    ) -> Dict[str, Any]:
+        """Execute a local skill script with permission controls, timeouts, secret redaction, and auditing."""
+        from skillforge.runtime.executor import LocalSkillExecutor
+        executor = LocalSkillExecutor(self.repo)
+        return executor.execute_script(
+            skill_identifier=skill_identifier,
+            script_path=script_path,
+            parameters=parameters,
+            granted_permissions=granted_permissions,
+            approval_token=approval_token,
+            conversation_id=conversation_id,
+            dry_run=dry_run,
+            timeout=timeout
+        )

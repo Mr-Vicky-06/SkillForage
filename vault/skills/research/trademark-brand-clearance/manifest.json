@@ -1,0 +1,28 @@
+{
+  "id": "trademark-brand-clearance",
+  "name": "trademark-brand-clearance",
+  "title": "Trademark & Brand Clearance Screening",
+  "description": "Screens proposed software package and product brand names across USPTO TESS and WIPO registers to prevent brand confusion.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "patents-ip",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "trademark",
+    "branding",
+    "wipo",
+    "tess"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "5b0da444edf091b71c32c0053463f4f20031eb37a83b9ed826519352dccb644b",
+  "external_apis": [
+    "https://www.wipo.int/branddb/en/"
+  ]
+}

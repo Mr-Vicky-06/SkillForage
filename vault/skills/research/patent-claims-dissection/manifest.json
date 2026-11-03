@@ -1,0 +1,26 @@
+{
+  "id": "patent-claims-dissection",
+  "name": "patent-claims-dissection",
+  "title": "Patent Claims Dissection & Limitation Charting",
+  "description": "Deconstructs independent and dependent patent claims into element-by-element limitation charts to analyze claim breadth.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "patents-ip",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "patents",
+    "claims",
+    "legal",
+    "ip-analysis"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "a5df50143eadb2f24881208c9b86284bb23b72258aed59dc938a28f58af8475e",
+  "external_apis": []
+}

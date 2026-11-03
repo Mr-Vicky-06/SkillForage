@@ -1,0 +1,25 @@
+{
+  "id": "lib-rs-crates-benchmarking",
+  "name": "lib-rs-crates-benchmarking",
+  "title": "Language Package Benchmarking & Ecosystem Comparison",
+  "description": "Compares language-specific libraries (e.g. PyPI wheels, Crates.io packages, npm modules) on binary size, memory footprint, and adoption.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "open-source",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "benchmarking",
+    "crates",
+    "pypi",
+    "npm"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "b8f7fdba34530993790f1b5d029d28d2dc47a95ae60fd4a8e93c36d394b44754",
+  "external_apis": []
+}

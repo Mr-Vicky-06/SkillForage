@@ -1,0 +1,26 @@
+{
+  "id": "freedom-to-operate-audit",
+  "name": "freedom-to-operate-audit",
+  "title": "Freedom-To-Operate (FTO) Risk Assessment",
+  "description": "Maps product architecture and technical specifications against active patent claim limitations to calculate patent infringement risk.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "patents-ip",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "fto",
+    "patent-risk",
+    "compliance",
+    "intellectual-property"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "8d0ff0910d170a17e69a5c9256adfd58991cdc8e9dc820090ed7a1f1b4eb6fc6",
+  "external_apis": []
+}

@@ -1,0 +1,28 @@
+{
+  "id": "patent-prior-art-search",
+  "name": "patent-prior-art-search",
+  "title": "Patent Prior Art Search & Classification",
+  "description": "Searches global patent registries (USPTO, Google Patents, EPO Espacenet) using CPC/IPC classifications to detect prior art.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "patents-ip",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "patents",
+    "prior-art",
+    "cpc",
+    "intellectual-property"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "f09628dfc669cb02f93b4b3100e8cf7dd472a80b49d261c42be1f2b1aa629c94",
+  "external_apis": [
+    "https://patents.google.com"
+  ]
+}

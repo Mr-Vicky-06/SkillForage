@@ -1,0 +1,28 @@
+{
+  "id": "semantic-scholar-citation-graph",
+  "name": "semantic-scholar-citation-graph",
+  "title": "Semantic Scholar Citation Graph Explorer",
+  "description": "Maps paper citation trees, co-citations, highly influential citations, and author h-index trajectories using Semantic Scholar and Connected Papers protocols.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "scholarly-literature",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "academic",
+    "citations",
+    "semantic-scholar",
+    "literature"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "0e7a22db18e2bbddd12fec0d5f96289fa93b036f133a8a267a0ca736847816c6",
+  "external_apis": [
+    "https://api.semanticscholar.org/graph/v1"
+  ]
+}

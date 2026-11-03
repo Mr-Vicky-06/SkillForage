@@ -1,0 +1,28 @@
+{
+  "id": "sec-edgar-financial-analysis",
+  "name": "sec-edgar-financial-analysis",
+  "title": "SEC EDGAR Financial Filing Analysis",
+  "description": "Extracts revenue breakdowns, R&D expenditure, risk factors, and executive commentary directly from official SEC 10-K, 10-Q, and 8-K filings.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "market-intelligence",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "sec-edgar",
+    "financial",
+    "10-k",
+    "due-diligence"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "04a02d827771bd062aa37be7e26d7a0a7f2de4e9658051bcac0baa1bd92e5679",
+  "external_apis": [
+    "https://data.sec.gov"
+  ]
+}

@@ -262,6 +262,69 @@ def init_database(db_path: str | Path) -> sqlite3.Connection:
         CREATE INDEX IF NOT EXISTS idx_mcp_capabilities_server ON mcp_capabilities(server_asset_id);
         CREATE INDEX IF NOT EXISTS idx_mcp_capabilities_name ON mcp_capabilities(name);
 
+        
+
+-- SLIF Approval State & Session Tracking
+CREATE TABLE IF NOT EXISTS pending_approvals (
+    approval_token TEXT PRIMARY KEY,
+    conversation_id TEXT,
+    turn_id INTEGER DEFAULT 1,
+    task_query TEXT NOT NULL,
+    candidate_ids_json TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending', -- pending, approved, declined, expired, loaded
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    resolved_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS approval_audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    approval_token TEXT NOT NULL,
+    conversation_id TEXT,
+    action TEXT NOT NULL, -- recommend, approve, decline, load, execute
+    skill_id TEXT,
+    decision TEXT NOT NULL,
+    details_json TEXT,
+    timestamp TEXT NOT NULL
+);
+
+-- SLIF Research Cache & Verification Records
+CREATE TABLE IF NOT EXISTS research_cache (
+    query_key TEXT PRIMARY KEY,
+    source_api TEXT NOT NULL,
+    data_json TEXT NOT NULL,
+    content_hash TEXT,
+    cached_at TEXT NOT NULL,
+    expires_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS cross_verification_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    claim_text TEXT NOT NULL,
+    verified_status TEXT NOT NULL, -- verified, disputed, unverified, contradictory
+    confidence_score REAL NOT NULL,
+    evidence_json TEXT,
+    verified_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS execution_audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversation_id TEXT,
+    skill_id TEXT NOT NULL,
+    script_path TEXT NOT NULL,
+    params_json TEXT,
+    permissions_granted TEXT,
+    duration_ms REAL,
+    exit_code INTEGER,
+    output_summary TEXT,
+    timestamp TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_approvals_status ON pending_approvals(status);
+CREATE INDEX IF NOT EXISTS idx_approvals_expires ON pending_approvals(expires_at);
+CREATE INDEX IF NOT EXISTS idx_approval_audit_token ON approval_audit_log(approval_token);
+CREATE INDEX IF NOT EXISTS idx_research_cache_api ON research_cache(source_api);
+
         """)
         
     return conn

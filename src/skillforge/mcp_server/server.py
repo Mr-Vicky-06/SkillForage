@@ -128,6 +128,46 @@ def create_mcp_server(db_path: Optional[str] = None) -> MCPServer:
     def validate_ecosystem_asset(asset_id: str) -> Dict[str, Any]:
         return tools.validate_ecosystem_asset(asset_id=asset_id)
 
+
+    @server.tool(name="skillforge_recommend_skills", description="SLIF: Recommend ranked specialist skills for a task, returning a single-use human approval token and consent prompt.")
+    def skillforge_recommend_skills(task: str, project_path: str = "", conversation_id: str = "", max_skills: int = 3) -> Dict[str, Any]:
+        p = project_path.strip() if project_path else None
+        return tools.slif_recommend_skills(task=task, project_path=p, conversation_id=conversation_id, max_skills=max_skills)
+
+    @server.tool(name="skillforge_load_approved_skills", description="SLIF: Load full specialist skill instructions into context, strictly requiring verified human approval token.")
+    def skillforge_load_approved_skills(approval_token: str, approved_skill_ids: List[str], conversation_id: str = "") -> Dict[str, Any]:
+        return tools.slif_load_approved_skills(approval_token=approval_token, approved_skill_ids=approved_skill_ids, conversation_id=conversation_id)
+
+    @server.tool(name="skillforge_decline_skills", description="SLIF: Record user decision to decline proposed specialist skills, preserving standard agent capabilities.")
+    def skillforge_decline_skills(approval_token: str, conversation_id: str = "") -> Dict[str, Any]:
+        return tools.slif_decline_skills(approval_token=approval_token, conversation_id=conversation_id)
+
+    @server.tool(name="skillforge_cross_source_verify", description="SLIF: Execute cross-source verification protocol (Tier 1/2/3 classification, contradiction checks, confidence score).")
+    def skillforge_cross_source_verify(statement: str, sources: List[Dict[str, Any]]) -> Dict[str, Any]:
+        return tools.slif_cross_source_verify(statement=statement, sources=sources)
+
+    @server.tool(name="skillforge_execute_script", description="SLIF: Execute approved local skill script with timeout, secret redaction, and audit logging.")
+    def skillforge_execute_script(
+        skill_identifier: str,
+        script_path: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        granted_permissions: Optional[List[str]] = None,
+        approval_token: str = "",
+        conversation_id: str = "",
+        dry_run: bool = False,
+        timeout: float = 30.0
+    ) -> Dict[str, Any]:
+        return tools.slif_execute_script(
+            skill_identifier=skill_identifier,
+            script_path=script_path,
+            parameters=parameters,
+            granted_permissions=granted_permissions,
+            approval_token=approval_token,
+            conversation_id=conversation_id,
+            dry_run=dry_run,
+            timeout=timeout
+        )
+
     return server
 
 

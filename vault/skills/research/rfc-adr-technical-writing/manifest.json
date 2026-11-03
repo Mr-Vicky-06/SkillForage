@@ -1,0 +1,26 @@
+{
+  "id": "rfc-adr-technical-writing",
+  "name": "rfc-adr-technical-writing",
+  "title": "RFC & Architecture Decision Record (ADR) Authoring",
+  "description": "Authors persuasive RFCs (RFC 2119 keywords) and Architecture Decision Records (MADR / Nygard format) with explicit trade-off analyses.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "technical-architecture",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "architecture",
+    "adr",
+    "rfc",
+    "documentation"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "4a5292082074e6745ac38cff7cc6d070ac30e79271fa8caeb492d88e75e972e0",
+  "external_apis": []
+}

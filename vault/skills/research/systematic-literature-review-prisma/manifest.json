@@ -1,0 +1,26 @@
+{
+  "id": "systematic-literature-review-prisma",
+  "name": "systematic-literature-review-prisma",
+  "title": "Systematic Literature Review (PRISMA 2020)",
+  "description": "Structures systematic literature reviews with inclusion/exclusion criteria, deduplication, screening matrices, and PRISMA flowcharts.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "scholarly-literature",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "prisma",
+    "systematic-review",
+    "academic",
+    "synthesis"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "3785a49468a7213b4ccf3d242ece3674aee4d966536e1eff88458b64cb54f29b",
+  "external_apis": []
+}

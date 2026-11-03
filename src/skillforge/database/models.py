@@ -17,6 +17,7 @@ class SkillStatus(str, Enum):
 
 class TrustLevel(str, Enum):
     TRUSTED = "trusted"         # Verified official or thoroughly audited
+    VERIFIED = "verified"       # Formally verified
     REVIEWED = "reviewed"       # Static inspection passed without flags
     UNVERIFIED = "unverified"   # Third-party, basic frontmatter only
     QUARANTINED = "quarantined" # Security risk, prompt override, etc.
@@ -29,6 +30,7 @@ class SourceType(str, Enum):
     INSTALLED_PLUGIN = "installed_plugin"
     INSTALLED_PROJECT = "installed_project"
     INSTALLED_BUILTIN = "installed_builtin"
+    VAULT = "vault"
 
 
 @dataclass

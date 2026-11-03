@@ -1,0 +1,28 @@
+{
+  "id": "github-ecosystem-analyzer",
+  "name": "github-ecosystem-analyzer",
+  "title": "GitHub Open-Source Ecosystem & Velocity Analyzer",
+  "description": "Analyzes open-source repo health: commit frequency, PR merge turnaround, issue triage latency, contributor bus factor, and release cadence.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "open-source",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": false,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "ACCESS_NETWORK"
+  ],
+  "tags": [
+    "research",
+    "github",
+    "oss-health",
+    "bus-factor",
+    "velocity"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "9f0c192f0c660db30d317d9fb5c10b564c68bf08aa4c4a7d7f1cd0a399542d53",
+  "external_apis": [
+    "https://api.github.com"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "saas-pricing-strategy-research",
+  "name": "saas-pricing-strategy-research",
+  "title": "SaaS Pricing Strategy & Monetization Modeling",
+  "description": "Analyzes SaaS pricing models (seat-based, usage-based, credit hybrid) across market competitors to model monetization strategies.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "market-intelligence",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "pricing",
+    "saas",
+    "monetization",
+    "market"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "f9d782b379cc1310bc4632b1fdd3299791f011d448b5fe0de2f2012a3976bad0",
+  "external_apis": []
+}

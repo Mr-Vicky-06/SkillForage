@@ -1,0 +1,26 @@
+{
+  "id": "ab-testing-experiment-design",
+  "name": "ab-testing-experiment-design",
+  "title": "A/B Testing & Controlled Experiment Design",
+  "description": "Calculates sample sizes, minimum detectable effects (MDE), statistical power (1-beta), and significance thresholds for controlled experiments.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "empirical-methodology",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "ab-testing",
+    "statistics",
+    "sample-size",
+    "experiment-design"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "94047f948aa14ea81c6c8cf7ad387094a8844bfc379791134be2e755226f3fe9",
+  "external_apis": []
+}

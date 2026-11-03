@@ -1,0 +1,26 @@
+{
+  "id": "oss-license-compliance-audit",
+  "name": "oss-license-compliance-audit",
+  "title": "Open-Source License Compliance & Copyleft Audit",
+  "description": "Scans dependency trees using SPDX identifiers to detect viral copyleft licenses (GPL, AGPL) that risk proprietary source code.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "open-source",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "licensing",
+    "spdx",
+    "compliance",
+    "gpl-check"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "812221c11b38429616f25d516dc66882832fc91dd582da32521d7f534f01bbf9",
+  "external_apis": []
+}

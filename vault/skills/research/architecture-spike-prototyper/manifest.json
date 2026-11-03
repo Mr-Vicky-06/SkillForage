@@ -1,0 +1,27 @@
+{
+  "id": "architecture-spike-prototyper",
+  "name": "architecture-spike-prototyper",
+  "title": "Architecture Spike Prototyper",
+  "description": "Implements minimal, throwaway proof-of-concept spike prototypes to evaluate high-risk architectural assumptions before commitment.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "technical-architecture",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES",
+    "EXECUTE_SCRIPT"
+  ],
+  "tags": [
+    "research",
+    "architecture",
+    "spike",
+    "poc",
+    "prototype"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "7c7cb3dc5071414bd01a279beb76a401a4f6b0abb6b48b48ba7558006ced55cd",
+  "external_apis": []
+}

@@ -1,0 +1,26 @@
+{
+  "id": "exploratory-data-analysis-eda",
+  "name": "exploratory-data-analysis-eda",
+  "title": "Automated Exploratory Data Analysis (EDA)",
+  "description": "Performs statistical distribution checks, outlier detection (IQR/Z-score), multicollinearity checks (VIF), and missing data profiling.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "empirical-methodology",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "eda",
+    "statistics",
+    "data-profiling",
+    "outliers"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "bebe41e5d16788b411093681545f02a672a95e96d1b7126afd9f81b59604e150",
+  "external_apis": []
+}

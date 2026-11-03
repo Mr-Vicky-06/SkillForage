@@ -1,0 +1,26 @@
+{
+  "id": "whitepaper-executive-briefing",
+  "name": "whitepaper-executive-briefing",
+  "title": "Executive Research Whitepaper Briefing",
+  "description": "Synthesizes multi-page research documents into high-impact 2-page decision briefings using the Minto Pyramid Principle.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "empirical-methodology",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "executive-brief",
+    "synthesis",
+    "minto-pyramid",
+    "reporting"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "53a5c93dd33466cfcceb22f1b4dab53280b637a6c5c53064e5b1f75da77e1e84",
+  "external_apis": []
+}

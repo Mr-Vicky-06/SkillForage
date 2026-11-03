@@ -1,0 +1,26 @@
+{
+  "id": "industry-trend-synthesis",
+  "name": "industry-trend-synthesis",
+  "title": "Industry Trend Synthesis & Tech Radar",
+  "description": "Synthesizes macro market shifts, Gartner hype-cycle positioning, and ThoughtWorks Tech Radar matrices for strategic executive planning.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "market-intelligence",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "tech-radar",
+    "trends",
+    "market-intelligence",
+    "strategy"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "e0fd8e3f9925491b61cf0d6bb1798df9b64629b394fe51a5f39d35abbde43a71",
+  "external_apis": []
+}

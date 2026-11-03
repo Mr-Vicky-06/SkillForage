@@ -1,0 +1,25 @@
+{
+  "id": "fact-checking-hallucination-filter",
+  "name": "fact-checking-hallucination-filter",
+  "title": "Fact-Checking & Hallucination Mitigation Filter",
+  "description": "Extracts atomic factual claims from generated research narratives and verifies each claim against primary sources to eliminate hallucinations.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "empirical-methodology",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "fact-checking",
+    "hallucination-filter",
+    "verification"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "49279e8e242331ebc5a4b4e056057c63ea35af6fac9062ed40fe84cd573f7018",
+  "external_apis": []
+}

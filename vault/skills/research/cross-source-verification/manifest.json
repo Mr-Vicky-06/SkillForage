@@ -1,0 +1,26 @@
+{
+  "id": "cross-source-verification",
+  "name": "cross-source-verification",
+  "title": "SLIF Cross-Source Fact & Citation Verification Protocol",
+  "description": "Orchestrates multi-source validation, source tiering (Tier 1/2/3), contradiction resolution, and confidence scoring across research outputs.",
+  "version": "1.0.0",
+  "category": "research",
+  "subcategory": "empirical-methodology",
+  "author": "SkillForge Team",
+  "license": "MIT",
+  "offline_capable": true,
+  "required_permissions": [
+    "READ_LOCAL_FILES",
+    "WRITE_LOCAL_FILES"
+  ],
+  "tags": [
+    "research",
+    "cross-source-verification",
+    "fact-checking",
+    "source-tiering",
+    "slif"
+  ],
+  "entrypoint": "SKILL.md",
+  "sha256": "6123570d9c58e455e2f3fb68afa5cdf1ed02a268700aa7f2871910371a3d132d",
+  "external_apis": []
+}
