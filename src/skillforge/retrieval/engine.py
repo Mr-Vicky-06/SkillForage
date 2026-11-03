@@ -134,6 +134,9 @@ class HybridRetrievalEngine:
         for skill_id, skill in candidate_skills.items():
             multiplier = self.repo.get_skill_feedback_multiplier(skill_id)
             final_q = skill.quality_score * multiplier
+            # Active local/global tools priority boost
+            if skill.source_type in (SourceType.INSTALLED_GLOBAL, SourceType.INSTALLED_PROJECT):
+                final_q *= 1.25
             quality_list.append((skill_id, final_q))
         quality_list.sort(key=lambda x: x[1], reverse=True)
 
