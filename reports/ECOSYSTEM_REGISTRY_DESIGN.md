@@ -109,3 +109,4 @@ MCP capabilities record tool schemas, parameter names, and transport types, but 
 
 ---
 *Design verified and implemented in SkillForge Repository.*
+

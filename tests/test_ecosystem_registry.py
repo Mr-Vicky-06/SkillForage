@@ -226,3 +226,4 @@ def test_mcp_tools_ecosystem(temp_repo):
     validation = tools.validate_ecosystem_asset("agent_code_reviewer")
     assert validation["is_ide_compatible"] is True
     assert validation["asset_type"] == "custom_agent"
+

@@ -569,3 +569,4 @@ class EcosystemScanner:
         )
         self.repo.insert_ecosystem_asset(asset)
         stats["legacy_workflows_indexed"] += 1
+

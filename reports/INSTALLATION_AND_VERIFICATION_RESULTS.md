@@ -116,3 +116,4 @@ Rationale: Tailored setup for antigravity-skillforge (python): 4 skills, 3 rules
 
 ---
 *Verified and signed off by SkillForge Infrastructure Team.*
+

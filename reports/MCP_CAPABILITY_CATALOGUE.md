@@ -75,3 +75,4 @@ SkillForge’s `MCPConfigParser` enforces strict security hygiene:
 
 ---
 *Catalog generated and audited by SkillForge Ecosystem Engine.*
+
