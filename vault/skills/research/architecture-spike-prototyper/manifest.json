@@ -23,5 +23,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "7c7cb3dc5071414bd01a279beb76a401a4f6b0abb6b48b48ba7558006ced55cd",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "9580ee2f0f5adfb470702241dda8bd5c3a6ba4b9fba90ae3b4bf3a5e1a763692",
+  "script_entrypoint": "scripts/run_spike.py"
 }

@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "53a5c93dd33466cfcceb22f1b4dab53280b637a6c5c53064e5b1f75da77e1e84",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "5629acbb15a5cfd34cd8d6cd70acba82e5d454d0fb7acad52cc62812152aeeae",
+  "script_entrypoint": "scripts/format_brief.py"
 }

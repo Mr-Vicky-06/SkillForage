@@ -70,13 +70,13 @@ def test_mcp_server_protocol():
         assert "load_skill" in tool_names
         assert "skillforge_status" in tool_names
 
-        # 3. Call recommend_skills tool
+        # 3. Call skillforge_recommend_skills tool (SLIF gated flow)
         send_rpc({
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
             "params": {
-                "name": "recommend_skills",
+                "name": "skillforge_recommend_skills",
                 "arguments": {
                     "task": "Develop an Android mobile app with Jetpack Compose",
                     "project_path": "D:/setup",
@@ -90,11 +90,12 @@ def test_mcp_server_protocol():
         assert not call_resp["result"].get("isError"), f"Tool error: {call_resp['result']}"
         res_content = call_resp["result"]["content"][0]["text"]
         parsed_res = json.loads(res_content)
-        print(f"[PASS] Tool Execution (recommend_skills): {parsed_res['selected_count']} skill(s) selected")
-        print(f"       Primary skill: {parsed_res['recommendations'][0]['skill_name']}")
+        token = parsed_res["approval_token"]
+        candidates = parsed_res["candidate_ids"]
+        print(f"[PASS] Tool Execution (recommend_skills): Token {token} generated for {len(candidates)} candidates")
 
-        # 4. Call load_skill tool
-        primary_skill = parsed_res['recommendations'][0]['skill_name']
+        # 4. Attempt unapproved load_skill -> MUST be rejected
+        primary_skill = candidates[0]
         send_rpc({
             "jsonrpc": "2.0",
             "id": 4,
@@ -106,12 +107,47 @@ def test_mcp_server_protocol():
                 }
             }
         })
+        unappr_resp = read_rpc()
+        assert "ACCESS DENIED" in unappr_resp["result"]["content"][0]["text"]
+        print(f"[PASS] Security Gating: Unapproved load_skill rejected as expected")
 
+        # 5. Explicit user approval via skillforge_approve_skills
+        send_rpc({
+            "jsonrpc": "2.0",
+            "id": 5,
+            "method": "tools/call",
+            "params": {
+                "name": "skillforge_approve_skills",
+                "arguments": {
+                    "approval_token": token,
+                    "approved_skill_ids": candidates
+                }
+            }
+        })
+        appr_resp = read_rpc()
+        parsed_appr = json.loads(appr_resp["result"]["content"][0]["text"])
+        assert parsed_appr["approved"] is True
+        print(f"[PASS] Human Approval Gate: Token transitioned to APPROVED")
+
+        # 6. Call load_skill with approved token -> Succeeded
+        send_rpc({
+            "jsonrpc": "2.0",
+            "id": 6,
+            "method": "tools/call",
+            "params": {
+                "name": "load_skill",
+                "arguments": {
+                    "skill_name_or_id": primary_skill,
+                    "approval_token": token
+                }
+            }
+        })
         load_resp = read_rpc()
         assert load_resp is not None, "Failed to receive load_skill response"
         load_content = load_resp["result"]["content"][0]["text"]
         parsed_load = json.loads(load_content)
-        print(f"[PASS] Tool Execution (load_skill): Loaded {parsed_load['skill_name']} ({len(parsed_load['content'])} characters)")
+        assert "instructions" in parsed_load
+        print(f"[PASS] Authorized Load: Successfully loaded {parsed_load['name']} ({len(parsed_load['instructions'])} characters)")
 
         print("\nAll end-to-end MCP protocol checks passed!")
 

@@ -24,5 +24,7 @@
   "sha256": "5b0da444edf091b71c32c0053463f4f20031eb37a83b9ed826519352dccb644b",
   "external_apis": [
     "https://www.wipo.int/branddb/en/"
-  ]
+  ],
+  "script_sha256": "8c40588322f379780f5beb5e2c9c5c4a4e0b2ee42f1e1d176206cf58e4eba21f",
+  "script_entrypoint": "scripts/screen_mark.py"
 }

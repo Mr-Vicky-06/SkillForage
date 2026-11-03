@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "a5df50143eadb2f24881208c9b86284bb23b72258aed59dc938a28f58af8475e",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "fc5f90a06a42ef09cbc2460deedf08af9724a3ad41106797fd06ea2f9211b97a",
+  "script_entrypoint": "scripts/dissect_claims.py"
 }

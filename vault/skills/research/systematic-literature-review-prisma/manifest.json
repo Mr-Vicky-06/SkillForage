@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "3785a49468a7213b4ccf3d242ece3674aee4d966536e1eff88458b64cb54f29b",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "8d79303aa55546cc7730dc800649045ad8520950376c2ef1f1fd35ee2725524c",
+  "script_entrypoint": "scripts/prisma_flow.py"
 }

@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "24958e3143c59669da82a0a33525a2609acc90d918a8a3fc1ed7f37a63225e0e",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "879ac2e00948fe8599bed52f02e9aae692b782127ba85e7b7a0e7ce3916816b8",
+  "script_entrypoint": "scripts/har_to_openapi.py"
 }

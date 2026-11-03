@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "4a5292082074e6745ac38cff7cc6d070ac30e79271fa8caeb492d88e75e972e0",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "4da183c969d7df35e326db574878a69b11fba6158dc9872bae49cbd7d2e7cf0b",
+  "script_entrypoint": "scripts/validate_adr.py"
 }

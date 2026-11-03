@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "d6f0018c9d6d8b71ec249971e7eaa9d61075164d54896fb04383b4c66a4114e3",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "0c98a77af384390d95c4c49a8d62ad3aade1a9eeecb1532dd2e5907c5a6c36ba",
+  "script_entrypoint": "scripts/build_matrix.py"
 }

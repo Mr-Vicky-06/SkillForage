@@ -24,5 +24,7 @@
   "sha256": "a32afdae998146f23fd8b7fd51d7c9a688ef4724de00985e3a2b98694b615810",
   "external_apis": [
     "https://api.crossref.org/works/"
-  ]
+  ],
+  "script_sha256": "696170029293dfb78d4646b332ab6530111daf41c70789b686a225b0eab2756f",
+  "script_entrypoint": "scripts/resolve_doi.py"
 }

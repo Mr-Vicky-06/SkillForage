@@ -21,5 +21,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "f9d782b379cc1310bc4632b1fdd3299791f011d448b5fe0de2f2012a3976bad0",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "8cfbf5d25b110333bb840a53bcdb56553120eb0588254f341cac138f94e85695",
+  "script_entrypoint": "scripts/model_pricing.py"
 }

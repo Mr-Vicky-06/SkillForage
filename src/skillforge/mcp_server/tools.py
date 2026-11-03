@@ -107,45 +107,42 @@ class SkillForgeTools:
             } if profile else None
         }
 
-    def load_skill(self, skill_name_or_id: str) -> Dict[str, Any]:
-        """Loads a skill's full SKILL.md instructions into the agent context."""
-        skill = self.repo.get_skill_by_id(skill_name_or_id)
-        if not skill:
-            skill = self.repo.get_skill_by_name(skill_name_or_id)
-
-        if not skill:
+    def load_skill(self, skill_name_or_id: str, approval_token: str = "", conversation_id: str = "") -> Dict[str, Any]:
+        """Loads a skill's full SKILL.md instructions strictly requiring an APPROVED authorization token."""
+        if not approval_token:
             return {
-                "error": f"Skill '{skill_name_or_id}' not found in SkillForge registry."
+                "error": "ACCESS DENIED: Direct skill loading without user approval is prohibited. You must query 'skillforge_recommend_skills', obtain explicit human approval ('YES' or 'SELECT <id>'), and provide the valid approval token."
             }
+        from skillforge.runtime.loader import ControlledSkillLoader
+        loader = ControlledSkillLoader(self.repo)
+        return loader.load_approved_skill(
+            skill_identifier=skill_name_or_id,
+            approval_token=approval_token,
+            conversation_id=conversation_id
+        )
 
-        path = Path(skill.source_path)
-        if not path.is_file():
+    def read_skill_resource(self, skill_name_or_id: str, relative_path: str, approval_token: str = "", conversation_id: str = "") -> Dict[str, Any]:
+        """Reads a referenced resource file strictly requiring an approved authorization token and path traversal prevention."""
+        if not approval_token:
             return {
-                "error": f"Skill file does not exist on disk: {skill.source_path}"
+                "error": "ACCESS DENIED: Direct resource access without approval token is prohibited. Provide the approval token issued for this skill."
             }
+        from skillforge.approval.token_manager import ApprovalTokenManager
+        token_mgr = ApprovalTokenManager(self.repo.db_path)
+        status_rec = token_mgr.get_status(approval_token)
+        if not status_rec:
+            return {"error": f"ACCESS DENIED: Approval token '{approval_token}' not found."}
+        if status_rec.get("status") not in ["approved", "consumed"]:
+            return {"error": f"ACCESS DENIED: Token '{approval_token}' is not in an authorized state (status: {status_rec.get('status')})."}
 
-        try:
-            content = path.read_text(encoding="utf-8", errors="replace")
-        except Exception as e:
-            return {
-                "error": f"Failed to read skill file: {str(e)}"
-            }
+        # Verify conversation binding
+        if conversation_id and status_rec.get("conversation_id") and conversation_id != status_rec.get("conversation_id"):
+            return {"error": "ACCESS DENIED: Conversation binding mismatch."}
 
-        return {
-            "skill_name": skill.name,
-            "skill_id": skill.id,
-            "category": skill.category,
-            "source_type": skill.source_type.value,
-            "source_path": skill.source_path,
-            "file_hash": skill.file_hash,
-            "quality_score": skill.quality_score,
-            "warnings": skill.security_flags + ([f"Missing {f}" for f in skill.missing_files]),
-            "referenced_resources": skill.referenced_files,
-            "content": content
-        }
+        authorized_ids = status_rec.get("approved_ids") or status_rec.get("candidate_ids", [])
+        if not any(skill_name_or_id == a or a.endswith(f":{skill_name_or_id}") or a.endswith(f"--{skill_name_or_id}") or skill_name_or_id in a for a in authorized_ids):
+            return {"error": f"ACCESS DENIED: Skill '{skill_name_or_id}' was not authorized under token '{approval_token}'."}
 
-    def read_skill_resource(self, skill_name_or_id: str, relative_path: str) -> Dict[str, Any]:
-        """Reads a referenced resource or document file belonging to a skill with path traversal prevention."""
         skill = self.repo.get_skill_by_id(skill_name_or_id)
         if not skill:
             skill = self.repo.get_skill_by_name(skill_name_or_id)
@@ -507,25 +504,39 @@ class SkillForgeTools:
             "expires_in_minutes": 15
         }
 
+
+    def slif_approve_skills(
+        self,
+        approval_token: str,
+        approved_skill_ids: List[str],
+        conversation_id: str = "",
+        turn_id: int = 1
+    ) -> Dict[str, Any]:
+        """Record explicit user approval ('YES' or 'SELECT <id>') for a candidate skill collection."""
+        from skillforge.approval.token_manager import ApprovalTokenManager
+        token_mgr = ApprovalTokenManager(self.repo.db_path)
+        success, msg, valid_ids = token_mgr.approve_token(
+            token=approval_token,
+            approved_skill_ids=approved_skill_ids,
+            conversation_id=conversation_id,
+            turn_id=turn_id
+        )
+        return {
+            "approval_token": approval_token,
+            "approved": success,
+            "message": msg,
+            "authorized_skill_ids": valid_ids
+        }
+
     def slif_load_approved_skills(self, approval_token: str, approved_skill_ids: List[str], conversation_id: str = "") -> Dict[str, Any]:
-        """Load specialist skill instructions into context, strictly requiring verified approval token."""
+        """Load specialist skill instructions into context, strictly requiring an APPROVED token."""
         from skillforge.runtime.loader import ControlledSkillLoader
         loader = ControlledSkillLoader(self.repo)
-        results = []
-        for sid in approved_skill_ids:
-            res = loader.load_approved_skill(
-                skill_identifier=sid,
-                approval_token=approval_token,
-                conversation_id=conversation_id
-            )
-            results.append(res)
-
-        all_authorized = all(r.get("authorized", False) for r in results)
-        return {
-            "all_authorized": all_authorized,
-            "approval_token": approval_token,
-            "loaded_skills": results
-        }
+        return loader.load_approved_collection(
+            skill_identifiers=approved_skill_ids,
+            approval_token=approval_token,
+            conversation_id=conversation_id
+        )
 
     def slif_decline_skills(self, approval_token: str, conversation_id: str = "") -> Dict[str, Any]:
         """Record human decline of recommended skills."""

@@ -24,5 +24,7 @@
   "sha256": "f09628dfc669cb02f93b4b3100e8cf7dd472a80b49d261c42be1f2b1aa629c94",
   "external_apis": [
     "https://patents.google.com"
-  ]
+  ],
+  "script_sha256": "0b94523be2f473d8749dbc017f2f853c2afcbef9fb7b15629e91dad023bf0cb8",
+  "script_entrypoint": "scripts/cpc_lookup.py"
 }

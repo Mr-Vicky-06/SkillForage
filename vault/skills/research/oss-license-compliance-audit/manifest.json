@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "812221c11b38429616f25d516dc66882832fc91dd582da32521d7f534f01bbf9",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "7824bf6c694a4f40dfbd1f59938707f6fd6ab1eb61fe1b42eed5ab60378f5154",
+  "script_entrypoint": "scripts/audit_licenses.py"
 }

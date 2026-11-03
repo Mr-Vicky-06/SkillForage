@@ -45,13 +45,13 @@ def create_mcp_server(db_path: Optional[str] = None) -> MCPServer:
         p = project_path.strip() if project_path else None
         return tools.recommend_skills(task=task, project_path=p, max_skills=max_skills)
 
-    @server.tool(name="load_skill", description="Load full SKILL.md instructions and metadata for a selected skill into the current agent context.")
-    def load_skill(skill_name_or_id: str) -> Dict[str, Any]:
-        return tools.load_skill(skill_name_or_id=skill_name_or_id)
+    @server.tool(name="load_skill", description="Load full SKILL.md instructions into context (strictly requires an APPROVED authorization token).")
+    def load_skill(skill_name_or_id: str, approval_token: str = "", conversation_id: str = "") -> Dict[str, Any]:
+        return tools.load_skill(skill_name_or_id=skill_name_or_id, approval_token=approval_token, conversation_id=conversation_id)
 
-    @server.tool(name="read_skill_resource", description="Read an explicitly referenced resource, template, or documentation file belonging to a loaded skill.")
-    def read_skill_resource(skill_name_or_id: str, relative_path: str) -> Dict[str, Any]:
-        return tools.read_skill_resource(skill_name_or_id=skill_name_or_id, relative_path=relative_path)
+    @server.tool(name="read_skill_resource", description="Read a referenced resource file for an approved skill (strictly requires an authorization token).")
+    def read_skill_resource(skill_name_or_id: str, relative_path: str, approval_token: str = "", conversation_id: str = "") -> Dict[str, Any]:
+        return tools.read_skill_resource(skill_name_or_id=skill_name_or_id, relative_path=relative_path, approval_token=approval_token, conversation_id=conversation_id)
 
     @server.tool(name="list_skills", description="List indexed skills with category, source, and status filters.")
     def list_skills(
@@ -133,6 +133,10 @@ def create_mcp_server(db_path: Optional[str] = None) -> MCPServer:
     def skillforge_recommend_skills(task: str, project_path: str = "", conversation_id: str = "", max_skills: int = 3) -> Dict[str, Any]:
         p = project_path.strip() if project_path else None
         return tools.slif_recommend_skills(task=task, project_path=p, conversation_id=conversation_id, max_skills=max_skills)
+
+    @server.tool(name="skillforge_approve_skills", description="SLIF: Record explicit user approval ('YES' or 'SELECT <id>') to transition token from PENDING to APPROVED.")
+    def skillforge_approve_skills(approval_token: str, approved_skill_ids: List[str], conversation_id: str = "", turn_id: int = 1) -> Dict[str, Any]:
+        return tools.slif_approve_skills(approval_token=approval_token, approved_skill_ids=approved_skill_ids, conversation_id=conversation_id, turn_id=turn_id)
 
     @server.tool(name="skillforge_load_approved_skills", description="SLIF: Load full specialist skill instructions into context, strictly requiring verified human approval token.")
     def skillforge_load_approved_skills(approval_token: str, approved_skill_ids: List[str], conversation_id: str = "") -> Dict[str, Any]:

@@ -23,5 +23,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "9615ca8ff80bdc61777007b8d162abde4504cbef9a674facfe2b878d86e3ac5c",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "59b188fd1b57e7d696d87989e2734996048b0802ef326306df73357ce7b05a9c",
+  "script_entrypoint": "scripts/compile_check.py"
 }

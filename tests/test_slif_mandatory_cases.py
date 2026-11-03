@@ -143,7 +143,10 @@ def test_08_approval_gating_yes_loads_all(tools):
     token = rec["approval_token"]
     c_ids = rec["candidate_ids"]
 
-    # Human confirms YES -> Load all candidate skills
+    # Human confirms YES -> Approve first, then Load
+    appr_res = tools.slif_approve_skills(approval_token=token, approved_skill_ids=c_ids)
+    assert appr_res["approved"] is True
+
     load_res = tools.slif_load_approved_skills(
         approval_token=token,
         approved_skill_ids=c_ids
@@ -165,6 +168,9 @@ def test_09_approval_gating_select_subset_loads_only_selected(tools):
     assert len(c_ids) >= 1
 
     selected_id = c_ids[:1]
+    appr_res = tools.slif_approve_skills(approval_token=token, approved_skill_ids=selected_id)
+    assert appr_res["approved"] is True
+
     load_res = tools.slif_load_approved_skills(
         approval_token=token,
         approved_skill_ids=selected_id
@@ -240,6 +246,7 @@ def test_13_unapproved_script_execution_blocked(executor):
 def test_14_offline_execution_local_script(token_mgr, executor):
     skill_id = "research--systematic-literature-review-prisma"
     token = token_mgr.create_approval_request(task="Offline PRISMA", candidate_ids=[skill_id])
+    token_mgr.approve_token(token=token, approved_skill_ids=[skill_id])
     script_path = Path("vault/skills/research/systematic-literature-review-prisma/scripts/prisma_flow.py")
 
     res = executor.execute_script(
@@ -250,7 +257,7 @@ def test_14_offline_execution_local_script(token_mgr, executor):
     )
     assert res["success"] is True
     assert res["exit_code"] == 0
-    assert "status" in res["stdout"]
+    assert "valid_flow" in res["stdout"]
 
 
 # ---------------------------------------------------------
@@ -260,6 +267,7 @@ def test_15_strict_offline_enforcement(repo, token_mgr):
     offline_executor = LocalSkillExecutor(repo, token_mgr, strict_offline=True)
     skill_id = "research--github-ecosystem-analyzer"
     token = token_mgr.create_approval_request(task="Analyze repo", candidate_ids=[skill_id])
+    token_mgr.approve_token(token=token, approved_skill_ids=[skill_id])
     script_path = Path("vault/skills/research/github-ecosystem-analyzer/scripts/analyze_repo.py")
 
     res = offline_executor.execute_script(
@@ -334,6 +342,7 @@ def test_18_research_cache_hit(repo):
 def test_19_tamper_detection_checksum_mismatch(repo, token_mgr, loader, tmp_path):
     skill_id = "research--ab-testing-experiment-design"
     token = token_mgr.create_approval_request(task="Tamper check", candidate_ids=[skill_id])
+    token_mgr.approve_token(token=token, approved_skill_ids=[skill_id])
 
     skill = repo.get_skill_by_id(skill_id)
     original_path = Path(skill.source_path)
@@ -350,6 +359,7 @@ def test_19_tamper_detection_checksum_mismatch(repo, token_mgr, loader, tmp_path
         original_path.write_bytes(original_bytes)
 
     token2 = token_mgr.create_approval_request(task="Tamper check 2", candidate_ids=[skill_id])
+    token_mgr.approve_token(token=token2, approved_skill_ids=[skill_id])
     clean_res = loader.load_approved_skill(skill_id, approval_token=token2)
     assert clean_res["authorized"] is True
 

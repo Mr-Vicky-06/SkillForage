@@ -24,5 +24,7 @@
   "sha256": "0e7a22db18e2bbddd12fec0d5f96289fa93b036f133a8a267a0ca736847816c6",
   "external_apis": [
     "https://api.semanticscholar.org/graph/v1"
-  ]
+  ],
+  "script_sha256": "e59e0f7b642586719ce3e4e91e6a4dd8faf4b9f331819d0d119bb4d68e2be310",
+  "script_entrypoint": "scripts/query_graph.py"
 }

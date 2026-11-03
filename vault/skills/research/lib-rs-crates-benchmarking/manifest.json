@@ -21,5 +21,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "b8f7fdba34530993790f1b5d029d28d2dc47a95ae60fd4a8e93c36d394b44754",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "2ea383b2753526efaad7e7c03ab0cb055919e8365e21d4d04e0dc05330c97bf5",
+  "script_entrypoint": "scripts/benchmark_table.py"
 }

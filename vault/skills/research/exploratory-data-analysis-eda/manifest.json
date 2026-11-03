@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "bebe41e5d16788b411093681545f02a672a95e96d1b7126afd9f81b59604e150",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "7e72a2283e1f2ffb6c1e0988b5521edd7366688e7b1e520efda61eb59ea57f9d",
+  "script_entrypoint": "scripts/run_eda.py"
 }

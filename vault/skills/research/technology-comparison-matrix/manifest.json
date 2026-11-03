@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "75ff03b10498cd64c8e215d9b957447b315fc916d86903ced2ff2078f2cd6989",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "4ca18262cb8f825c1bf671368dc7ee56b1a817197501764e621cac8ecd1c7161",
+  "script_entrypoint": "scripts/mcda_score.py"
 }

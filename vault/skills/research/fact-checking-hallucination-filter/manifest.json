@@ -21,5 +21,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "49279e8e242331ebc5a4b4e056057c63ea35af6fac9062ed40fe84cd573f7018",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "c46b337f761294741bd92378f05c6efdc86add2a617da8dcdbfe7772483a3ae3",
+  "script_entrypoint": "scripts/filter_claims.py"
 }

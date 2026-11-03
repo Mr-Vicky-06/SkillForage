@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "8d0ff0910d170a17e69a5c9256adfd58991cdc8e9dc820090ed7a1f1b4eb6fc6",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "934e8aa89bbf3c787163d0dbf59393699193a7b1862cb91d87353373aa556e85",
+  "script_entrypoint": "scripts/fto_matrix.py"
 }

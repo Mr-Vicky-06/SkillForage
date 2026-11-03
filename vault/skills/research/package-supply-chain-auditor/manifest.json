@@ -24,5 +24,7 @@
   "sha256": "dc4745a5d96fecbd6557559d1a2e75cb8f3cdd6f16b44dc076ed9c02ab007740",
   "external_apis": [
     "https://api.osv.dev/v1/query"
-  ]
+  ],
+  "script_sha256": "31309619192c0abc88f708cdca2328ae0ad60264934753da7f7d09de99385cdd",
+  "script_entrypoint": "scripts/check_hygiene.py"
 }

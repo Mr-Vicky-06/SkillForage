@@ -24,5 +24,7 @@
   "sha256": "9f0c192f0c660db30d317d9fb5c10b564c68bf08aa4c4a7d7f1cd0a399542d53",
   "external_apis": [
     "https://api.github.com"
-  ]
+  ],
+  "script_sha256": "bf8b1e5cc398bc67d388b0438188ea819f583970f161de19c63da98daf191edc",
+  "script_entrypoint": "scripts/analyze_repo.py"
 }

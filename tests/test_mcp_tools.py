@@ -45,11 +45,21 @@ def test_tool_recommend_skills():
 
 def test_tool_load_skill():
     tools = get_test_tools()
-    # Test loading an installed skill (karpathy-guidelines)
-    res = tools.load_skill("karpathy-guidelines")
+    # 1. Unapproved load must be denied
+    unappr_res = tools.load_skill("karpathy-guidelines")
+    assert "error" in unappr_res
+    assert "ACCESS DENIED" in unappr_res["error"]
+
+    # 2. Approved load must succeed
+    from skillforge.approval.token_manager import ApprovalTokenManager
+    mgr = ApprovalTokenManager(tools.repo.db_path)
+    tok = mgr.create_approval_request("Load Karpathy", ["karpathy-guidelines"])
+    mgr.approve_token(tok, ["karpathy-guidelines"])
+
+    res = tools.load_skill("karpathy-guidelines", approval_token=tok)
     assert "error" not in res
-    assert res["skill_name"] == "karpathy-guidelines"
-    assert "Simplicity First" in res["content"] or "Think Before Coding" in res["content"]
+    assert res["name"] == "karpathy-guidelines"
+    assert "Simplicity First" in res["instructions"] or "Think Before Coding" in res["instructions"]
 
 
 def test_tool_list_skills():
@@ -80,7 +90,17 @@ def test_tool_record_feedback():
 
 def test_tool_read_resource_path_traversal():
     tools = get_test_tools()
-    res = tools.read_skill_resource("karpathy-guidelines", "../../Windows/win.ini")
+    # 1. Unapproved call denied
+    unappr = tools.read_skill_resource("karpathy-guidelines", "../../Windows/win.ini")
+    assert "ACCESS DENIED" in unappr.get("error", "")
+
+    # 2. Approved call blocked by PathGuard
+    from skillforge.approval.token_manager import ApprovalTokenManager
+    mgr = ApprovalTokenManager(tools.repo.db_path)
+    tok = mgr.create_approval_request("Read resource", ["karpathy-guidelines"])
+    mgr.approve_token(tok, ["karpathy-guidelines"])
+
+    res = tools.read_skill_resource("karpathy-guidelines", "../../Windows/win.ini", approval_token=tok)
     assert "error" in res
     assert "Security Violation" in res["error"] or "outside" in res["error"]
 

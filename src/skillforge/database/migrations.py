@@ -272,6 +272,9 @@ CREATE TABLE IF NOT EXISTS pending_approvals (
     task_query TEXT NOT NULL,
     candidate_ids_json TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending', -- pending, approved, declined, expired, loaded
+    approved_ids_json TEXT,
+    approved_at TEXT,
+    consumed_at TEXT,
     created_at TEXT NOT NULL,
     expires_at TEXT NOT NULL,
     resolved_at TEXT

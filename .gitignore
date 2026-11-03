@@ -20,6 +20,7 @@ build/
 *.db-wal
 *.db-shm
 *.bak
+*.security_backup_*
 data/cache/
 
 # Playwright & Browser Testing Cache

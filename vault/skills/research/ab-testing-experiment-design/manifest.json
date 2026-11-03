@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "94047f948aa14ea81c6c8cf7ad387094a8844bfc379791134be2e755226f3fe9",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "7118391854425262c8c79a3b3540230103e3f29f6d09594427e22204677ad57f",
+  "script_entrypoint": "scripts/power_analysis.py"
 }

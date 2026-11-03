@@ -22,5 +22,7 @@
   ],
   "entrypoint": "SKILL.md",
   "sha256": "6123570d9c58e455e2f3fb68afa5cdf1ed02a268700aa7f2871910371a3d132d",
-  "external_apis": []
+  "external_apis": [],
+  "script_sha256": "e21452c9558ef066fe2a7bf4930453e3bd9eea5cf3a46bfe59418e30a13bdfa9",
+  "script_entrypoint": "scripts/verify_protocol.py"
 }

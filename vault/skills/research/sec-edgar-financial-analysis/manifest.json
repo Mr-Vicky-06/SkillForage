@@ -24,5 +24,7 @@
   "sha256": "04a02d827771bd062aa37be7e26d7a0a7f2de4e9658051bcac0baa1bd92e5679",
   "external_apis": [
     "https://data.sec.gov"
-  ]
+  ],
+  "script_sha256": "6da2e2081a2c4992c61ef86d3d953aa84f37ae98616439fbabd1c161b727e894",
+  "script_entrypoint": "scripts/fetch_filings.py"
 }
