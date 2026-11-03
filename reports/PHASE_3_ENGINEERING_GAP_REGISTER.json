@@ -1,0 +1,105 @@
+{
+  "audit_version": "1.0.0",
+  "audit_date": "2026-11-03",
+  "project": "SkillForge",
+  "branch": "evolution/sep-v1",
+  "total_gaps_identified": 12,
+  "gaps": [
+    {
+      "id": "GAP-001",
+      "subsystem": "database",
+      "severity": "HIGH",
+      "component": "schema/migrations.py",
+      "description": "Lack of typed knowledge graph tables (graph_nodes, graph_edges, graph_evidence, entity_aliases) preventing multi-hop relational retrieval.",
+      "remediation": "Create SQLite migration adding graph tables and indexes with foreign keys."
+    },
+    {
+      "id": "GAP-002",
+      "subsystem": "retrieval",
+      "severity": "CRITICAL",
+      "component": "retrieval/ranking.py",
+      "description": "Lexical BM25 ranking lacks principled rank fusion (RRF), resulting in false-positive matches on token overlap and false-negatives on technical concepts.",
+      "remediation": "Implement Reciprocal Rank Fusion combiner fusing FTS5 lexical, graph neighborhood, and context alignment scores."
+    },
+    {
+      "id": "GAP-003",
+      "subsystem": "retrieval",
+      "severity": "HIGH",
+      "component": "retrieval/search.py",
+      "description": "FTS5 query syntax crashes when task contains unescaped boolean operators or punctuation (*, \", AND, OR, NOT).",
+      "remediation": "Implement robust FTS5 query sanitizer with token normalization."
+    },
+    {
+      "id": "GAP-004",
+      "subsystem": "retrieval",
+      "severity": "MEDIUM",
+      "component": "retrieval/cache.py",
+      "description": "Absence of query caching causing repeated recommendation queries to re-evaluate 851 candidates at 31-42ms latency.",
+      "remediation": "Implement content-hashed LRU query cache with automatic invalidation on registry updates."
+    },
+    {
+      "id": "GAP-005",
+      "subsystem": "retrieval",
+      "severity": "HIGH",
+      "component": "retrieval/engine.py",
+      "description": "Single recommendation mode cannot adapt between quick lookup and deep multi-hop dependency resolution.",
+      "remediation": "Implement multi-mode retrieval: fast, balanced, deep, discovery, bootstrap."
+    },
+    {
+      "id": "GAP-006",
+      "subsystem": "graph",
+      "severity": "HIGH",
+      "component": "graph/traversal.py",
+      "description": "No graph traversal capability to discover prerequisites, complements, and conflicts across skills.",
+      "remediation": "Implement recursive SQLite CTE graph traverser with max-depth and relationship filtering."
+    },
+    {
+      "id": "GAP-007",
+      "subsystem": "analyzer",
+      "severity": "MEDIUM",
+      "component": "analyzer/project_detector.py",
+      "description": "Project boundary not strictly enforced, risking traversal outside project root into parent directories.",
+      "remediation": "Enforce strict root resolution and boundary checks with Path.resolve().is_relative_to()."
+    },
+    {
+      "id": "GAP-008",
+      "subsystem": "analyzer",
+      "severity": "LOW",
+      "component": "analyzer/project_detector.py",
+      "description": "Test suite detection ignores test configuration files (pytest.ini, conftest.py, playwright.config.ts).",
+      "remediation": "Add inspection patterns for test framework configs and test directory structures."
+    },
+    {
+      "id": "GAP-009",
+      "subsystem": "mcp",
+      "severity": "MEDIUM",
+      "component": "mcp_server/tools.py",
+      "description": "MCP server lacks transparency tools for scoring breakdown, graph exploration, and health statistics.",
+      "remediation": "Add explain_recommendation, graph_query, graph_neighbors, list_project_profiles, and skillforge_health tools."
+    },
+    {
+      "id": "GAP-010",
+      "subsystem": "cli",
+      "severity": "LOW",
+      "component": "cli.py",
+      "description": "CLI does not provide commands for graph inspection, cache management, or automated evaluation.",
+      "remediation": "Implement 'graph', 'cache-clear', and 'eval' CLI subcommands."
+    },
+    {
+      "id": "GAP-011",
+      "subsystem": "dashboard",
+      "severity": "MEDIUM",
+      "component": "dashboard/app.py",
+      "description": "Dashboard has only 5 basic pages and lacks interactive graph visualization, retrieval sandbox, and evaluation dashboard.",
+      "remediation": "Transform dashboard into a 10-view developer intelligence console with HTML5 canvas graph visualizer."
+    },
+    {
+      "id": "GAP-012",
+      "subsystem": "database",
+      "severity": "LOW",
+      "component": "database/migrations.py",
+      "description": "Missing database PRAGMA tuning for cache_size, temp_store, and synchronous mode.",
+      "remediation": "Configure optimal SQLite pragmas (WAL, NORMAL sync, MEMORY temp_store, 64MB cache)."
+    }
+  ]
+}
