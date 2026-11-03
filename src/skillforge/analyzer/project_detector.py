@@ -81,6 +81,19 @@ class ProjectDetector:
                     languages.add("sql")
 
                 # Package manifest inspections
+                if f_lower in ("pytest.ini", "conftest.py", "tox.ini"):
+                    testing_frameworks.add("pytest")
+                    detected_files.append(rel_file)
+                elif f_lower in ("playwright.config.ts", "playwright.config.js"):
+                    testing_frameworks.add("playwright")
+                    detected_files.append(rel_file)
+                elif f_lower in ("jest.config.js", "jest.config.ts"):
+                    testing_frameworks.add("jest")
+                    detected_files.append(rel_file)
+                elif f_lower in ("vitest.config.ts", "vitest.config.js"):
+                    testing_frameworks.add("vitest")
+                    detected_files.append(rel_file)
+
                 if f_lower == "package.json":
                     package_managers.add("npm")
                     detected_files.append(rel_file)

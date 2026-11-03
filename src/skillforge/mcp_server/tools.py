@@ -6,8 +6,10 @@ from typing import Any, Dict, List, Optional
 
 from skillforge.database.models import SkillRecord, SkillStatus, SourceType
 from skillforge.database.repository import SkillRepository
+from skillforge.graph.traversal import GraphTraverser
 from skillforge.indexer.validator import SkillValidator
 from skillforge.retrieval.context_matcher import ContextMatcher
+from skillforge.retrieval.engine import HybridRetrievalEngine, RetrievalMode
 from skillforge.security.path_guard import PathTraversalError, validate_safe_relative_path
 
 
@@ -15,6 +17,8 @@ class SkillForgeTools:
     def __init__(self, repository: SkillRepository):
         self.repo = repository
         self.matcher = ContextMatcher(repository)
+        self.engine = HybridRetrievalEngine(repository)
+        self.traverser = GraphTraverser(repository)
         self.validator = SkillValidator()
 
     def status(self) -> Dict[str, Any]:
@@ -248,4 +252,179 @@ class SkillForgeTools:
             "recorded_rating": clamped_rating,
             "feedback_type": feedback_type
         }
+
+    def explain_recommendation(
+        self,
+        skill_name_or_id: str,
+        task: str,
+        project_path: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Provide detailed scoring breakdown and graph signals for why a skill was recommended."""
+        skill = self.repo.get_skill_by_id(skill_name_or_id)
+        if not skill:
+            skill = self.repo.get_skill_by_name(skill_name_or_id)
+
+        if not skill:
+            return {"error": f"Skill '{skill_name_or_id}' not found."}
+
+        # Analyze task and project
+        task_analysis = self.matcher.classifier.classify(task)
+        project_profile = None
+        if project_path:
+            p = Path(project_path).resolve()
+            if p.is_dir():
+                project_profile = self.matcher.detector.analyze_workspace(p)
+
+        # Cluster and neighbors
+        cluster = self.traverser.find_related_cluster(skill.id)
+
+        # Lexical score
+        fts_res = self.repo.search_fts(task, limit=30)
+        lexical_rank = None
+        lexical_score = 0.0
+        for rank, (s, sc) in enumerate(fts_res, 1):
+            if s.id == skill.id:
+                lexical_rank = rank
+                lexical_score = round(sc, 4)
+                break
+
+        # Feedback multiplier
+        fb_mult = self.repo.get_skill_feedback_multiplier(skill.id)
+
+        # Project tech match
+        matched_techs = []
+        if project_profile:
+            p_techs = set(t.lower() for t in (project_profile.frameworks + project_profile.languages + project_profile.databases))
+            s_techs = set(t.lower() for t in skill.technologies)
+            matched_techs = sorted(list(p_techs.intersection(s_techs)))
+
+        return {
+            "skill_id": skill.id,
+            "skill_name": skill.name,
+            "category": skill.category,
+            "quality_score": skill.quality_score,
+            "feedback_multiplier": fb_mult,
+            "lexical": {
+                "rank": lexical_rank,
+                "score": lexical_score,
+                "in_top_30": lexical_rank is not None
+            },
+            "technology_alignment": {
+                "matched_technologies": matched_techs,
+                "skill_technologies": skill.technologies
+            },
+            "knowledge_graph": {
+                "category": cluster["category"],
+                "concepts": cluster.get("concepts", []),
+                "prerequisites_count": len(cluster["prerequisites"]),
+                "complements_count": len(cluster["complements"])
+            },
+            "task_domains": task_analysis.domains,
+            "task_intents": task_analysis.intents
+        }
+
+    def graph_query(
+        self,
+        query_type: str,
+        identifier: str,
+        max_hops: int = 1
+    ) -> Dict[str, Any]:
+        """Perform typed queries against the Knowledge Fabric.
+        
+        query_type options: 'cluster', 'neighbors', 'prerequisites', 'complements', 'technology', 'concept'.
+        """
+        q = query_type.lower().strip()
+        if q == "cluster":
+            return self.traverser.find_related_cluster(identifier)
+        elif q == "prerequisites":
+            return {
+                "target": identifier,
+                "prerequisites": self.traverser.find_skill_prerequisites(identifier)
+            }
+        elif q == "complements":
+            return {
+                "target": identifier,
+                "complements": self.traverser.find_skill_complements(identifier)
+            }
+        elif q == "technology":
+            return {
+                "technology": identifier,
+                "skills": self.traverser.find_skills_by_technology(identifier)
+            }
+        elif q == "concept":
+            return {
+                "concept": identifier,
+                "skills": self.traverser.find_skills_by_concept(identifier)
+            }
+        else:
+            neighbors = self.traverser.get_neighbors(identifier, max_hops=max_hops)
+            return {
+                "node": identifier,
+                "neighbor_count": len(neighbors),
+                "neighbors": neighbors
+            }
+
+    def graph_neighbors(
+        self,
+        node_id: str,
+        relationship_type: Optional[str] = None,
+        max_hops: int = 1
+    ) -> Dict[str, Any]:
+        """Traverse neighbors of a node with optional relationship filter."""
+        rel = relationship_type.strip() if relationship_type else None
+        neighbors = self.traverser.get_neighbors(node_id, relationship_type=rel, max_hops=max_hops)
+        return {
+            "node_id": node_id,
+            "relationship_filter": rel,
+            "max_hops": max_hops,
+            "count": len(neighbors),
+            "neighbors": neighbors
+        }
+
+    def list_project_profiles(self) -> List[Dict[str, Any]]:
+        """Return all stored project architectural profiles in SQLite."""
+        cur = self.repo.conn.cursor()
+        cur.execute("SELECT project_path, profile_json, last_analyzed_at FROM project_profiles ORDER BY last_analyzed_at DESC")
+        profiles = []
+        for r in cur.fetchall():
+            try:
+                data = json.loads(r["profile_json"])
+            except Exception:
+                data = {}
+            profiles.append({
+                "project_path": r["project_path"],
+                "last_analyzed_at": r["last_analyzed_at"],
+                "languages": data.get("languages", []),
+                "frameworks": data.get("frameworks", []),
+                "databases": data.get("databases", []),
+                "testing_frameworks": data.get("testing_frameworks", [])
+            })
+        return profiles
+
+    def skillforge_health(self) -> Dict[str, Any]:
+        """Comprehensive health check of registry, graph, indexes, and cache."""
+        cur = self.repo.conn.cursor()
+        
+        # Check SQLite integrity
+        cur.execute("PRAGMA integrity_check;")
+        integrity = cur.fetchone()[0]
+        
+        # Check FTS5
+        cur.execute("SELECT COUNT(*) as cnt FROM skill_fts;")
+        fts_count = cur.fetchone()["cnt"]
+        
+        stats = self.repo.get_stats()
+        graph_stats = self.repo.get_graph_stats()
+        cache_stats = self.engine.cache.stats()
+        
+        return {
+            "status": "healthy" if integrity == "ok" else "degraded",
+            "sqlite_integrity": integrity,
+            "total_skills": stats["total_skills"],
+            "fts5_indexed_rows": fts_count,
+            "graph": graph_stats,
+            "cache": cache_stats,
+            "database_path": str(self.repo.db_path)
+        }
+
 

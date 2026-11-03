@@ -296,6 +296,95 @@ def report(output: str):
     click.echo(f"Report written to: {out_path}")
 
 
+@cli.command("graph")
+@click.option("--rebuild", is_flag=True, help="Rebuild Knowledge Fabric from all indexed skills.")
+@click.option("--cluster", default=None, help="Show cluster for a skill id or name.")
+@click.option("--stats", is_flag=True, help="Show Knowledge Fabric node and edge statistics.")
+def graph_cmd(rebuild: bool, cluster: Optional[str], stats: bool):
+    """Inspect and manage the SkillForge Knowledge Fabric."""
+    repo = get_default_repo()
+    from skillforge.graph.builder import KnowledgeGraphBuilder
+    from skillforge.graph.traversal import GraphTraverser
+
+    if rebuild:
+        click.echo("Rebuilding Knowledge Fabric graph...")
+        builder = KnowledgeGraphBuilder(repo)
+        res = builder.build_graph()
+        click.echo(f"Graph rebuilt in {res['build_duration_ms']}ms: {res['total_nodes']} nodes, {res['total_edges']} edges, {res['total_aliases']} aliases.")
+        return
+
+    if cluster:
+        traverser = GraphTraverser(repo)
+        c = traverser.find_related_cluster(cluster)
+        click.echo(f"=== Knowledge Fabric Cluster: {cluster} ===")
+        click.echo(f"Node ID: {c['node_id']}")
+        click.echo(f"Category: {c['category']}")
+        click.echo(f"Technologies: {', '.join(c['technologies']) if c['technologies'] else 'None'}")
+        click.echo(f"Concepts: {', '.join(c.get('concepts', [])) if c.get('concepts') else 'None'}")
+        click.echo(f"Prerequisites ({len(c['prerequisites'])}): {', '.join(p['name'] for p in c['prerequisites']) or 'None'}")
+        click.echo(f"Complements ({len(c['complements'])}): {', '.join(p['name'] for p in c['complements']) or 'None'}")
+        return
+
+    # Default to stats
+    st = repo.get_graph_stats()
+    click.echo("=== Knowledge Fabric Graph Statistics ===")
+    click.echo(f"Total Nodes: {st['total_nodes']}")
+    click.echo(f"Total Edges: {st['total_edges']}")
+    click.echo(f"Total Aliases: {st['total_aliases']}")
+    click.echo("Nodes by Type:")
+    for ntype, cnt in st.get("nodes_by_type", {}).items():
+        click.echo(f"  - {ntype}: {cnt}")
+
+
+@cli.command("cache-clear")
+def cache_clear_cmd():
+    """Clear SkillForge in-memory retrieval cache."""
+    repo = get_default_repo()
+    tools = SkillForgeTools(repo)
+    tools.engine.cache.clear()
+    click.echo("Retrieval query cache successfully cleared.")
+
+
+@cli.command("eval")
+@click.option("--limit", default=3, help="Top-k limit for recommendations.")
+def eval_cmd(limit: int):
+    """Run built-in benchmark test across representative scenarios."""
+    repo = get_default_repo()
+    tools = SkillForgeTools(repo)
+    
+    test_cases = [
+        ("Clean code and architecture refactoring in Python", ["clean-code", "software-architect"]),
+        ("End-to-end browser automation with Playwright", ["playwright-cli", "browser-testing-with-devtools"]),
+        ("BigQuery SQL optimization and query tuning", ["bigquery-sql", "bigquery-ai-ml"]),
+        ("Autonomous AI agents and memory systems", ["agent-memory-systems", "google-antigravity-sdk"]),
+        ("API security vulnerability audit and SAST", ["security-and-hardening", "security-reviewer"]),
+    ]
+    
+    click.echo("=== Running SkillForge Hybrid Retrieval Benchmark ===")
+    mrr_total = 0.0
+    for idx, (task, expected_any) in enumerate(test_cases, 1):
+        res = tools.recommend_skills(task=task, max_skills=limit)
+        recs = [r["skill_name"] for r in res.get("recommendations", [])]
+        
+        # Calculate reciprocal rank of first expected match
+        rr = 0.0
+        matched_expected = None
+        for r_rank, r_name in enumerate(recs, 1):
+            if any(exp in r_name.lower() or r_name.lower() in exp for exp in expected_any):
+                rr = 1.0 / r_rank
+                matched_expected = r_name
+                break
+        
+        mrr_total += rr
+        status_sym = "[PASS]" if rr > 0 else "[FAIL]"
+        click.echo(f"{idx}. {status_sym} Task: '{task[:45]}...'")
+        click.echo(f"   Expected: {expected_any} | Got: {recs[:limit]} (Match: {matched_expected}, RR: {round(rr, 2)})")
+    
+    mean_mrr = round(mrr_total / len(test_cases), 4)
+    click.echo("-----------------------------------------------------")
+    click.echo(f"Benchmark Mean Reciprocal Rank (MRR): {mean_mrr}")
+
+
 @cli.command("serve-dashboard")
 @click.option("--host", default="127.0.0.1", help="Host interface (local only).")
 @click.option("--port", default=8765, help="Port number.")

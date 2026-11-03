@@ -86,6 +86,28 @@ def create_mcp_server(db_path: Optional[str] = None) -> MCPServer:
             task_context=task_context
         )
 
+    @server.tool(name="explain_recommendation", description="Explain the ranking signals, graph distance, and technology match for a recommended skill.")
+    def explain_recommendation(skill_name_or_id: str, task: str, project_path: str = "") -> Dict[str, Any]:
+        p = project_path.strip() if project_path else None
+        return tools.explain_recommendation(skill_name_or_id=skill_name_or_id, task=task, project_path=p)
+
+    @server.tool(name="graph_query", description="Query Knowledge Fabric: 'cluster', 'prerequisites', 'complements', 'technology', 'concept', or 'neighbors'.")
+    def graph_query(query_type: str, identifier: str, max_hops: int = 1) -> Dict[str, Any]:
+        return tools.graph_query(query_type=query_type, identifier=identifier, max_hops=max_hops)
+
+    @server.tool(name="graph_neighbors", description="Traverse 1-hop or multi-hop graph neighbors of a skill, technology, or concept.")
+    def graph_neighbors(node_id: str, relationship_type: str = "", max_hops: int = 1) -> Dict[str, Any]:
+        rel = relationship_type.strip() if relationship_type else None
+        return tools.graph_neighbors(node_id=node_id, relationship_type=rel, max_hops=max_hops)
+
+    @server.tool(name="list_project_profiles", description="List all analyzed project architectural profiles stored in SkillForge.")
+    def list_project_profiles() -> List[Dict[str, Any]]:
+        return tools.list_project_profiles()
+
+    @server.tool(name="skillforge_health", description="Run comprehensive diagnostic health check on SQLite, indexes, graph nodes, and retrieval cache.")
+    def skillforge_health() -> Dict[str, Any]:
+        return tools.skillforge_health()
+
     return server
 
 
